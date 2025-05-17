@@ -1,5 +1,8 @@
 name: Generuj fotky.js
 
+permissions:
+  contents: write
+
 on:
   push:
     paths:
