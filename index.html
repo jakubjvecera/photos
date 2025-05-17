@@ -1,43 +1,62 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Moje galerie</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #f0f0f0;
-      margin: 0;
-      padding: 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-    }
-    .foto {
-      width: 300px;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Moje Galerie</title>
+<style>
+  body {
+    margin: 0;
+    background: #121212;
+    font-family: Arial, sans-serif;
+    color: #eee;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  #gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 1200px;
+    justify-content: center;
+  }
+  #gallery img {
+    max-width: 250px; /* maximální šířka */
+    height: auto;     /* zachování poměru stran */
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    transition: transform 0.3s;
+    cursor: pointer;
+  }
+  #gallery img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px rgba(255,255,255,0.8);
+  }
+</style>
 </head>
 <body>
-<script src="fotky.js"></script>
-<script>
-  // Náhodně promíchat
-  fotky.sort(() => 0.5 - Math.random());
+  <div id="gallery"></div>
 
-  // Zobrazit na stránce
-  fotky.forEach(jmeno => {
-    const img = document.createElement('img');
-    img.src = `fotos/${jmeno}`;
-    img.alt = jmeno;
-    img.className = "foto";
-    document.body.appendChild(img);
-  });
-</script>
+  <script src="fotky.js"></script>
+  <script>
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    const gallery = document.getElementById('gallery');
+    shuffle(fotky).forEach(src => {
+      const img = document.createElement('img');
+      img.src = 'fotos/' + src;
+      img.alt = src;
+      gallery.appendChild(img);
+    });
+  </script>
 </body>
 </html>
