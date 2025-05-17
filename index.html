@@ -14,26 +14,48 @@
   }
 
   #gallery {
-    column-count: 4;       /* počet sloupců */
-    column-gap: 15px;      /* mezera mezi sloupci */
+    column-count: 4;
+    column-gap: 15px;
     max-width: 1200px;
     margin: 0 auto;
   }
 
   #gallery img {
-    width: 100%;           /* vyplní šířku sloupce */
-    height: auto;          /* zachová poměr stran */
+    width: 100%;
+    height: auto;
     margin-bottom: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.7);
     cursor: pointer;
     transition: transform 0.3s;
-    display: block;        /* odstraní spodní mezery pod obrázky */
+    display: block;
   }
 
   #gallery img:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 16px rgba(255,255,255,0.8);
+  }
+
+  /* Lightbox styl */
+  #lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    cursor: pointer;
+  }
+
+  #lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(255,255,255,0.8);
   }
 
   @media (max-width: 900px) {
@@ -58,6 +80,9 @@
 <body>
   <div id="gallery"></div>
 
+  <!-- Lightbox container -->
+  <div id="lightbox"></div>
+
   <script src="fotky.js"></script>
   <script>
     function shuffle(array) {
@@ -69,11 +94,25 @@
     }
 
     const gallery = document.getElementById('gallery');
+    const lightbox = document.getElementById('lightbox');
+
     shuffle(fotky).forEach(src => {
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
       img.alt = src;
+
+      img.addEventListener('click', () => {
+        lightbox.innerHTML = `<img src="fotos/${src}" alt="${src}">`;
+        lightbox.style.display = 'flex';
+      });
+
       gallery.appendChild(img);
+    });
+
+    // Zavřít lightbox kliknutím kdekoliv
+    lightbox.addEventListener('click', () => {
+      lightbox.style.display = 'none';
+      lightbox.innerHTML = '';
     });
   </script>
 </body>
