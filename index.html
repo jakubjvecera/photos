@@ -46,7 +46,12 @@
       letter-spacing: 2px;
       color: #ccc;
     }
-
+#logo {
+  width: 40px;       /* uprav podle velikosti loga */
+  height: auto;
+  margin-bottom: 760px;
+  object-fit: contain;
+}
     #sidebar .links {
       display: flex;
       flex-direction: column;
@@ -143,6 +148,7 @@
   <!-- Boční panel -->
   <div id="sidebar">
     <h1>Jakub Večeřa</h1>
+    <img src="logo.png" alt="Logo" id="logo" />
     <div class="links">
       <a href="mailto:jakub.j.vecera@gmail.com">Email</a>
       <a href="https://instagram.com/jakubjvecera" target="_blank">Instagram</a>
