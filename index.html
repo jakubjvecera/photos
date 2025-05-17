@@ -2,187 +2,190 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Moje galerie</title>
-  <link rel="icon" href="favicon.png" type="image/png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="icon.png" type="image/png">
+  <title>Jakub Večeřa</title>
   <style>
     body {
       margin: 0;
-      font-family: sans-serif;
-      background: radial-gradient(circle, #111 0%, #000 100%);
-      color: white;
+      background-color: #121212;
+      background-image: repeating-linear-gradient(
+        45deg,
+        #1a1a1a 0px,
+        #1a1a1a 1px,
+        #121212 1px,
+        #121212 12px
+      );
+      font-family: Courier, sans-serif;
+      color: #eee;
       display: flex;
     }
 
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      height: 100vh;
-      width: 60px;
-      background: rgba(0, 0, 0, 0.8);
+    /* Levý boční panel */
+    #sidebar {
+      width: 80px;
+      background: #1c1c1c;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 0;
-      z-index: 1000;
+      padding: 20px 5px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 1001;
+    }
+
+    #sidebar h1 {
       writing-mode: vertical-rl;
-      text-orientation: mixed;
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .sidebar h1 {
-      font-size: 14px;
-      margin: 5px 0 0;
       transform: rotate(180deg);
+      font-size: 35px;
+      margin: 0;
+      font-weight: normal;
+      letter-spacing: 2px;
+      color: #ccc;
     }
 
-    .sidebar .logo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .sidebar .logo img {
-      width: 24px;
-      height: 24px;
-      transform: rotate(180deg);
-    }
-
-    .sidebar .buttons {
+    #sidebar .links {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      transform: rotate(180deg);
     }
 
-    .sidebar button {
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .gallery {
-      margin-left: 60px;
-      padding: 10px;
-      column-count: 3;
-      column-gap: 10px;
-    }
-
-    .gallery img {
-      width: 100%;
-      margin-bottom: 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .lightbox {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-    }
-
-    .lightbox img {
-      max-width: 90%;
-      max-height: 90%;
+    #sidebar .links a {
+      color: #eee;
+      text-decoration: none;
+      font-size: 12px;
+      background: #333;
+      padding: 6px 10px;
       border-radius: 6px;
+      text-align: center;
+      transition: background 0.3s;
     }
 
-    @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
+    #sidebar .links a:hover {
+      background: #555;
+    }
 
-      .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        justify-content: space-between;
-        writing-mode: horizontal-tb;
-        padding: 5px 15px;
-        border-right: none;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-      }
+    #gallery-container {
+      margin-left: 80px;
+      padding: 20px;
+      width: 100%;
+    }
 
-      .sidebar .logo {
-        flex-direction: row;
-        gap: 10px;
-      }
+    #gallery {
+      column-count: 4;
+      column-gap: 15px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-      .sidebar .logo img {
-        transform: none;
-      }
+    #gallery img {
+      width: 100%;
+      height: auto;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+      cursor: pointer;
+      transition: transform 0.3s;
+      display: block;
+    }
 
-      .sidebar h1 {
-        transform: none;
-        font-size: 16px;
-        margin: 0;
-      }
+    #gallery img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 16px rgba(255,255,255,0.8);
+    }
 
-      .sidebar .buttons {
-        flex-direction: row;
-        transform: none;
-      }
+    /* Lightbox */
+    #lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      cursor: pointer;
+    }
 
-      .gallery {
-        margin-left: 0;
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(255,255,255,0.8);
+    }
+
+    @media (max-width: 900px) {
+      #gallery {
+        column-count: 3;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #gallery {
         column-count: 2;
-        padding: 10px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      #gallery {
+        column-count: 1;
       }
     }
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <div class="logo">
-      <img src="icon.png" alt="Logo">
-      <h1>Jakub Večeřa</h1>
-    </div>
-    <div class="buttons">
-      <button onclick="window.location.href='mailto:tvuj@email.cz'">📧</button>
-      <button onclick="window.open('https://instagram.com/tvujprofil', '_blank')">📸</button>
-      <button onclick="window.open('https://zonerama.cz/tvujprofil', '_blank')">🖼️</button>
+
+  <!-- Boční panel -->
+  <div id="sidebar">
+    <h1>Jakub Večeřa</h1>
+    <div class="links">
+      <a href="mailto:jakub.j.vecera@gmail.com">Email</a>
+      <a href="https://instagram.com/jakubjvecera" target="_blank">Instagram</a>
+      <a href="https://zonerama.com/jakubjvecera/" target="_blank">Zonerama</a>
     </div>
   </div>
 
-  <div class="gallery" id="gallery"></div>
-
-  <div class="lightbox" id="lightbox">
-    <img src="" alt="detail" id="lightbox-img">
+  <!-- Galerie -->
+  <div id="gallery-container">
+    <div id="gallery"></div>
   </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox"></div>
 
   <script src="fotky.js"></script>
   <script>
-    const gallery = document.getElementById("gallery");
-    const lightbox = document.getElementById("lightbox");
-    const lightboxImg = document.getElementById("lightbox-img");
-
-    const shuffled = fotos.sort(() => 0.5 - Math.random());
-    for (const foto of shuffled) {
-      const img = document.createElement("img");
-      img.src = foto;
-      img.alt = "";
-      img.onclick = () => {
-        lightbox.style.display = "flex";
-        lightboxImg.src = foto;
-      };
-      gallery.appendChild(img);
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
     }
 
-    lightbox.onclick = () => {
-      lightbox.style.display = "none";
-      lightboxImg.src = "";
-    };
+    const gallery = document.getElementById('gallery');
+    const lightbox = document.getElementById('lightbox');
+
+    shuffle(fotky).forEach(src => {
+      const img = document.createElement('img');
+      img.src = 'fotos/' + src;
+      img.alt = src;
+      img.addEventListener('click', () => {
+        lightbox.innerHTML = `<img src="fotos/${src}" alt="${src}">`;
+        lightbox.style.display = 'flex';
+      });
+      gallery.appendChild(img);
+    });
+
+    lightbox.addEventListener('click', () => {
+      lightbox.style.display = 'none';
+      lightbox.innerHTML = '';
+    });
   </script>
 </body>
 </html>
