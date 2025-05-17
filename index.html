@@ -1,154 +1,153 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Moje Galerie</title>
-<style>
-  body {
-    margin: 0;
-    background: #121212;
-    font-family: Arial, sans-serif;
-    color: #eee;
-    padding: 20px;
-    display: flex;
-  }
-
-  /* Boční panel vlevo */
-  #sidebar {
-    writing-mode: vertical-rl; /* text svisle zprava doleva */
-    text-orientation: mixed;
-    background: #1e1e1e;
-    padding: 20px 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    width: 60px;
-    height: 100vh;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.7);
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1100;
-    font-weight: 600;
-    font-size: 18px;
-    user-select: none;
-  }
-
-  #sidebar .name {
-    margin-bottom: auto;
-    white-space: nowrap;
-  }
-
-  #sidebar .buttons {
-    writing-mode: horizontal-tb; /* tlačítka normálně */
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: auto;
-  }
-
-  #sidebar a {
-    color: #eee;
-    text-decoration: none;
-    background: #333;
-    padding: 8px 10px;
-    border-radius: 6px;
-    font-size: 14px;
-    text-align: center;
-    transition: background 0.3s;
-  }
-
-  #sidebar a:hover {
-    background: #555;
-  }
-
-  /* Posun galerie doprava, aby nebyla pod sidebar */
-  #gallery-container {
-    margin-left: 60px;
-    width: calc(100% - 60px);
-  }
-
-  #gallery {
-    column-count: 4;
-    column-gap: 15px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  #gallery img {
-    width: 100%;
-    height: auto;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.7);
-    cursor: pointer;
-    transition: transform 0.3s;
-    display: block;
-  }
-
-  #gallery img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 16px rgba(255,255,255,0.8);
-  }
-
-  /* Lightbox styl */
-  #lightbox {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    cursor: pointer;
-  }
-
-  #lightbox img {
-    max-width: 90vw;
-    max-height: 90vh;
-    border-radius: 10px;
-    box-shadow: 0 0 30px rgba(255,255,255,0.8);
-  }
-
-  @media (max-width: 900px) {
-    #gallery {
-      column-count: 3;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Moje Galerie</title>
+  <style>
+    body {
+      margin: 0;
+      background: #121212;
+      font-family: Arial, sans-serif;
+      color: #eee;
+      display: flex;
     }
-  }
 
-  @media (max-width: 600px) {
-    #gallery {
-      column-count: 2;
+    /* Levý boční panel */
+    #sidebar {
+      width: 60px;
+      background: #1c1c1c;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 5px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 1001;
     }
-  }
 
-  @media (max-width: 400px) {
-    #gallery {
-      column-count: 1;
+    #sidebar h1 {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-size: 16px;
+      margin: 0;
+      font-weight: normal;
+      letter-spacing: 2px;
+      color: #ccc;
     }
-  }
-</style>
+
+    #sidebar .links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #sidebar .links a {
+      color: #eee;
+      text-decoration: none;
+      font-size: 12px;
+      background: #333;
+      padding: 6px 10px;
+      border-radius: 4px;
+      text-align: center;
+      transition: background 0.3s;
+    }
+
+    #sidebar .links a:hover {
+      background: #555;
+    }
+
+    #gallery-container {
+      margin-left: 80px;
+      padding: 20px;
+      width: 100%;
+    }
+
+    #gallery {
+      column-count: 4;
+      column-gap: 15px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    #gallery img {
+      width: 100%;
+      height: auto;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+      cursor: pointer;
+      transition: transform 0.3s;
+      display: block;
+    }
+
+    #gallery img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 16px rgba(255,255,255,0.8);
+    }
+
+    /* Lightbox */
+    #lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6); /* poloprůhledné pozadí */
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      cursor: pointer;
+    }
+
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(255,255,255,0.8);
+    }
+
+    @media (max-width: 900px) {
+      #gallery {
+        column-count: 3;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #gallery {
+        column-count: 2;
+      }
+    }
+
+    @media (max-width: 400px) {
+      #gallery {
+        column-count: 1;
+      }
+    }
+  </style>
 </head>
 <body>
 
+  <!-- Boční panel -->
   <div id="sidebar">
-    <div class="name">Jakub Večeřa</div>
-    <div class="buttons">
-      <a href="mailto:tvujemail@example.com" target="_blank" rel="noopener noreferrer" title="Email">📧 Email</a>
-      <a href="https://instagram.com/tvujinstagram" target="_blank" rel="noopener noreferrer" title="Instagram">📸 Instagram</a>
+    <h1>Jakub Večeřa</h1>
+    <div class="links">
+      <a href="mailto:jakub@email.cz">Email</a>
+      <a href="https://instagram.com/tvoje_jmeno" target="_blank">Instagram</a>
+      <a href="https://zonerama.com/tvoje_zonerama" target="_blank">Zonerama</a>
     </div>
   </div>
 
+  <!-- Galerie -->
   <div id="gallery-container">
     <div id="gallery"></div>
   </div>
 
-  <!-- Lightbox container -->
+  <!-- Lightbox -->
   <div id="lightbox"></div>
 
   <script src="fotky.js"></script>
@@ -168,12 +167,10 @@
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
       img.alt = src;
-
       img.addEventListener('click', () => {
         lightbox.innerHTML = `<img src="fotos/${src}" alt="${src}">`;
         lightbox.style.display = 'flex';
       });
-
       gallery.appendChild(img);
     });
 
