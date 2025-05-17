@@ -16,9 +16,9 @@ jobs:
       - name: Vygeneruj fotky.js
         run: |
           echo "const fotky = [" > fotky.js
+          shopt -s nullglob
           for f in fotos/*.{jpg,jpeg,png,gif}; do
-            [ -f \"$f\" ] || continue
-            echo \"  \\\"$(basename \"$f\")\\\",\" >> fotky.js
+            echo "  \"$(basename "$f")\"," >> fotky.js
           done
           echo "];" >> fotky.js
 
@@ -27,5 +27,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add fotky.js
-          git commit -m "Automaticky aktualizovaný seznam fotek"
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "Automaticky aktualizovaný seznam fotek"
+            git push
+          else
+            echo "Žádné změny ke commitu."
+          fi
+
