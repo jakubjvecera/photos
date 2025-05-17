@@ -25,27 +25,19 @@
   </style>
 </head>
 <body>
-  <script>
-    // Seznam fotek ve složce 'fotos'
-    const fotky = [
-      "foto1.jpg",
-      "foto2.jpg",
-      "zazitky.jpg",
-      "vylety.png",
-      "letni-den.jpeg"
-    ];
+<script src="fotky.js"></script>
+<script>
+  // Náhodně promíchat
+  fotky.sort(() => 0.5 - Math.random());
 
-    // Náhodně promíchat
-    fotky.sort(() => 0.5 - Math.random());
-
-    // Zobrazit na stránce
-    fotky.forEach(jmeno => {
-      const img = document.createElement('img');
-      img.src = `fotos/${jmeno}`;
-      img.alt = jmeno;
-      img.className = "foto";
-      document.body.appendChild(img);
-    });
-  </script>
+  // Zobrazit na stránce
+  fotky.forEach(jmeno => {
+    const img = document.createElement('img');
+    img.src = `fotos/${jmeno}`;
+    img.alt = jmeno;
+    img.className = "foto";
+    document.body.appendChild(img);
+  });
+</script>
 </body>
 </html>
