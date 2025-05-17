@@ -11,6 +11,63 @@
     font-family: Arial, sans-serif;
     color: #eee;
     padding: 20px;
+    display: flex;
+  }
+
+  /* Boční panel vlevo */
+  #sidebar {
+    writing-mode: vertical-rl; /* text svisle zprava doleva */
+    text-orientation: mixed;
+    background: #1e1e1e;
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 60px;
+    height: 100vh;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.7);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1100;
+    font-weight: 600;
+    font-size: 18px;
+    user-select: none;
+  }
+
+  #sidebar .name {
+    margin-bottom: auto;
+    white-space: nowrap;
+  }
+
+  #sidebar .buttons {
+    writing-mode: horizontal-tb; /* tlačítka normálně */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: auto;
+  }
+
+  #sidebar a {
+    color: #eee;
+    text-decoration: none;
+    background: #333;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+    transition: background 0.3s;
+  }
+
+  #sidebar a:hover {
+    background: #555;
+  }
+
+  /* Posun galerie doprava, aby nebyla pod sidebar */
+  #gallery-container {
+    margin-left: 60px;
+    width: calc(100% - 60px);
   }
 
   #gallery {
@@ -43,7 +100,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0, 0, 0, 0.6);
     display: none;
     justify-content: center;
     align-items: center;
@@ -78,7 +135,18 @@
 </style>
 </head>
 <body>
-  <div id="gallery"></div>
+
+  <div id="sidebar">
+    <div class="name">Jakub Večeřa</div>
+    <div class="buttons">
+      <a href="mailto:tvujemail@example.com" target="_blank" rel="noopener noreferrer" title="Email">📧 Email</a>
+      <a href="https://instagram.com/tvujinstagram" target="_blank" rel="noopener noreferrer" title="Instagram">📸 Instagram</a>
+    </div>
+  </div>
+
+  <div id="gallery-container">
+    <div id="gallery"></div>
+  </div>
 
   <!-- Lightbox container -->
   <div id="lightbox"></div>
@@ -109,7 +177,6 @@
       gallery.appendChild(img);
     });
 
-    // Zavřít lightbox kliknutím kdekoliv
     lightbox.addEventListener('click', () => {
       lightbox.style.display = 'none';
       lightbox.innerHTML = '';
