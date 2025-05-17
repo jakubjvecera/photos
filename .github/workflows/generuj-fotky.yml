@@ -1,0 +1,31 @@
+name: Generuj fotky.js
+
+on:
+  push:
+    paths:
+      - 'fotos/**'
+      - '.github/workflows/generuj-fotky.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repozitář
+        uses: actions/checkout@v3
+
+      - name: Vygeneruj fotky.js
+        run: |
+          echo "const fotky = [" > fotky.js
+          for f in fotos/*.{jpg,jpeg,png,gif}; do
+            [ -f \"$f\" ] || continue
+            echo \"  \\\"$(basename \"$f\")\\\",\" >> fotky.js
+          done
+          echo "];" >> fotky.js
+
+      - name: Commit a push změn
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add fotky.js
+          git commit -m "Automaticky aktualizovaný seznam fotek"
+          git push
