@@ -10,30 +10,48 @@
     background: #121212;
     font-family: Arial, sans-serif;
     color: #eee;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     padding: 20px;
   }
+
   #gallery {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    column-count: 4;       /* počet sloupců */
+    column-gap: 15px;      /* mezera mezi sloupci */
     max-width: 1200px;
-    justify-content: center;
+    margin: 0 auto;
   }
+
   #gallery img {
-    max-width: 250px; /* maximální šířka */
-    height: auto;     /* zachování poměru stran */
+    width: 100%;           /* vyplní šířku sloupce */
+    height: auto;          /* zachová poměr stran */
+    margin-bottom: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.7);
-    transition: transform 0.3s;
     cursor: pointer;
+    transition: transform 0.3s;
+    display: block;        /* odstraní spodní mezery pod obrázky */
   }
+
   #gallery img:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 16px rgba(255,255,255,0.8);
+  }
+
+  @media (max-width: 900px) {
+    #gallery {
+      column-count: 3;
+    }
+  }
+
+  @media (max-width: 600px) {
+    #gallery {
+      column-count: 2;
+    }
+  }
+
+  @media (max-width: 400px) {
+    #gallery {
+      column-count: 1;
+    }
   }
 </style>
 </head>
