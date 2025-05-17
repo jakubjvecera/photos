@@ -1,5 +1,4 @@
 const fotky = [
-  "P1003768.jpg",
   "P1004176.jpg",
   "P1014255.jpg",
   "P1014293.jpg",
