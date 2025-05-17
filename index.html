@@ -36,29 +36,23 @@
       bottom: 0;
       z-index: 1001;
     }
-#logo-name {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: row;
-  gap: 10px;
-  height: 100%;  
-}
 
+    #sidebar h1 {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-size: 35px;
+      margin: 0;
+      font-weight: normal;
+      letter-spacing: 2px;
+      color: #ccc;
+    }
 #logo {
-  width: 35px;
+  position: fixed;
+  top: 320px;
+  left: 20px; /* Nebo třeba 50% pro vystředění */
+  width: 40px;
   height: auto;
   object-fit: contain;
-  filter: grayscale(100%) brightness(1.2); /* volitelně pro ladění s tmavým pozadím */
-}
-
-#sidebar h1 {
-  font-size: 20px;
-  margin: 0;
-  font-weight: normal;
-  letter-spacing: 2px;
-  color: #ccc;
-  text-align: center;
 }
     #sidebar .links {
       display: flex;
@@ -155,10 +149,8 @@
 
   <!-- Boční panel -->
   <div id="sidebar">
-  <div id="logo-name">
-  <img src="logo.png" alt="Logo" id="logo" />
-  <h1>Jakub Večeřa</h1>
-</div>
+    <h1>Jakub Večeřa</h1>
+    <img src="logo.png" alt="Logo" id="logo" />
     <div class="links">
       <a href="mailto:jakub.j.vecera@gmail.com">Email</a>
       <a href="https://instagram.com/jakubjvecera" target="_blank">Instagram</a>
