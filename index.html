@@ -58,7 +58,6 @@
       left: 20px;
       width: 40px;
       height: auto;
-      object-fit: contain;
     }
 
     @media (max-height: 500px) {
@@ -158,6 +157,29 @@
         column-count: 1;
       }
     }
+
+    /* ✅ Styl pro zelený toast */
+    #copy-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #28a745;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, top 0.3s ease;
+      z-index: 2000;
+    }
+
+    #copy-toast.show {
+      opacity: 1;
+      top: 40px;
+    }
   </style>
 </head>
 <body>
@@ -189,6 +211,16 @@
   <!-- Lightbox -->
   <div id="lightbox"></div>
 
+  <!-- ✅ Zelený toast -->
+  <div id="copy-toast">Zkopírováno do schránky!</div>
+
+  <!-- ✅ Info pro bez JS -->
+  <noscript>
+    <div style="padding: 20px; color: white; background-color: #222; text-align: center;">
+      ⚠️ Tato stránka vyžaduje JavaScript pro správné zobrazení galerie. Povolte JavaScript ve svém prohlížeči.
+    </div>
+  </noscript>
+
   <script src="fotky.js"></script>
   <script>
     function shuffle(array) {
@@ -206,6 +238,7 @@
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
       img.alt = src;
+      img.loading = "lazy"; // ✅ lazy loading
       img.addEventListener('click', () => {
         lightbox.innerHTML = `<img src="fotos/${src}" alt="${src}">`;
         lightbox.style.display = 'flex';
@@ -222,11 +255,21 @@
       event.preventDefault();
       const urlToCopy = element.getAttribute('data-copy');
       navigator.clipboard.writeText(urlToCopy).then(() => {
+        showCopyToast(`Zkopírováno: ${urlToCopy}`);
         window.open(element.href, '_blank');
       }).catch(err => {
         console.error('Chyba při kopírování:', err);
         window.open(element.href, '_blank');
       });
+    }
+
+    function showCopyToast(message) {
+      const toast = document.getElementById('copy-toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
     }
   </script>
 
