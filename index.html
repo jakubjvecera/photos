@@ -46,6 +46,12 @@
       color: #ccc;
     }
 
+    @media (max-height: 800px) {
+      #sidebar h1 {
+        display: none;
+      }
+    }
+
     #logo {
       position: fixed;
       top: 320px;
@@ -55,10 +61,19 @@
       object-fit: contain;
     }
 
+    @media (max-height: 800px) {
+      #logo {
+        top: 40px;
+        left: 20px;
+      }
+    }
+
     #sidebar .links {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      position: absolute;
+      bottom: 20px;
     }
 
     #sidebar .links a {
@@ -143,37 +158,11 @@
         column-count: 1;
       }
     }
-    @media (max-height: 500px) {
-  #sidebar h1 {
-    display: none;
-  }
-}
-
-
-    /* Notifikace o zkopírování */
-    #copy-toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #2ecc71;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 14px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease-in-out;
-      z-index: 2000;
-    }
-
-    #copy-toast.show {
-      opacity: 1;
-    }
   </style>
 </head>
 <body>
 
-  <!-- Boční panel -->
+  <!-- Sidebar -->
   <div id="sidebar">
     <h1>Jakub Večeřa</h1>
     <img src="logo.png" alt="Logo" id="logo" />
@@ -181,12 +170,10 @@
       <a href="mailto:jakub.j.vecera@gmail.com"
          data-copy="jakub.j.vecera@gmail.com"
          onclick="copyAndOpen(event, this)">Email</a>
-
       <a href="https://instagram.com/jakubjvecera"
          data-copy="@jakubjvecera"
          target="_blank"
          onclick="copyAndOpen(event, this)">Instagram</a>
-
       <a href="https://zonerama.com/jakubjvecera/"
          data-copy="jakubjvecera.zonerama.com"
          target="_blank"
@@ -201,9 +188,6 @@
 
   <!-- Lightbox -->
   <div id="lightbox"></div>
-
-  <!-- Toast notifikace -->
-  <div id="copy-toast">Zkopírováno do schránky</div>
 
   <script src="fotky.js"></script>
   <script>
@@ -237,24 +221,14 @@
     function copyAndOpen(event, element) {
       event.preventDefault();
       const urlToCopy = element.getAttribute('data-copy');
-
       navigator.clipboard.writeText(urlToCopy).then(() => {
-        showToast("Zkopírováno do schránky");
         window.open(element.href, '_blank');
       }).catch(err => {
         console.error('Chyba při kopírování:', err);
         window.open(element.href, '_blank');
       });
     }
-
-    function showToast(message) {
-      const toast = document.getElementById('copy-toast');
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2000);
-    }
   </script>
+
 </body>
 </html>
