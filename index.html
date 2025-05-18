@@ -205,5 +205,23 @@
       lightbox.innerHTML = '';
     });
   </script>
+  <script>
+  function copyAndOpen(event, element) {
+    event.preventDefault(); // Zabrání okamžitému otevření odkazu
+
+    const urlToCopy = element.getAttribute('data-copy');
+
+    // Zkopíruj do schránky
+    navigator.clipboard.writeText(urlToCopy).then(() => {
+      console.log('Zkopírováno:', urlToCopy);
+      // Otevři odkaz (nové okno nebo mailto)
+      window.open(element.href, '_blank');
+    }).catch(err => {
+      console.error('Chyba při kopírování:', err);
+      window.open(element.href, '_blank');
+    });
+  }
+</script>
+
 </body>
 </html>
