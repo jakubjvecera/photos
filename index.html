@@ -6,39 +6,24 @@
   <link rel="icon" href="icon.png" type="image/png">
   <title>Jakub Večeřa</title>
   <style>
-    :root {
-      --bg: #121212;
-      --bg-pattern: repeating-linear-gradient(45deg, #1a1a1a 0px, #1a1a1a 1px, #121212 1px, #121212 12px);
-      --text: #eee;
-      --link-bg: #333;
-      --link-hover: #555;
-      --toast-bg: #28a745;
-      --shadow: rgba(255,255,255,0.8);
-    }
-
-    body.light {
-      --bg: #f4f4f4;
-      --bg-pattern: repeating-linear-gradient(45deg, #ffffff 0px, #ffffff 1px, #f4f4f4 1px, #f4f4f4 12px);
-      --text: #111;
-      --link-bg: #ddd;
-      --link-hover: #ccc;
-      --toast-bg: #007bff;
-      --shadow: rgba(0,0,0,0.2);
-    }
-
     body {
       margin: 0;
-      background: var(--bg-pattern);
+      background-color: #121212;
+      background-image: repeating-linear-gradient(
+        45deg,
+        #1a1a1a 0px,
+        #1a1a1a 1px,
+        #121212 1px,
+        #121212 12px
+      );
       font-family: Courier, sans-serif;
-      color: var(--text);
+      color: #eee;
       display: flex;
-      transition: background 0.4s, color 0.4s;
     }
 
     #sidebar {
       width: 80px;
       background: #1c1c1c;
-      color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -58,6 +43,7 @@
       margin: 0;
       font-weight: normal;
       letter-spacing: 2px;
+      color: #ccc;
     }
 
     @media (max-height: 500px) {
@@ -90,10 +76,10 @@
     }
 
     #sidebar .links a {
-      color: var(--text);
+      color: #eee;
       text-decoration: none;
       font-size: 12px;
-      background: var(--link-bg);
+      background: #333;
       padding: 6px 10px;
       border-radius: 6px;
       text-align: center;
@@ -101,7 +87,7 @@
     }
 
     #sidebar .links a:hover {
-      background: var(--link-hover);
+      background: #555;
     }
 
     #gallery-container {
@@ -130,7 +116,7 @@
 
     #gallery img:hover {
       transform: scale(1.05);
-      box-shadow: 0 4px 16px var(--shadow);
+      box-shadow: 0 4px 16px rgba(255,255,255,0.8);
     }
 
     #lightbox {
@@ -151,7 +137,7 @@
       max-width: 90vw;
       max-height: 90vh;
       border-radius: 10px;
-      box-shadow: 0 0 30px var(--shadow);
+      box-shadow: 0 0 30px rgba(255,255,255,0.8);
     }
 
     @media (max-width: 900px) {
@@ -172,12 +158,13 @@
       }
     }
 
+    /* ✅ Styl pro zelený toast */
     #copy-toast {
       position: fixed;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background-color: var(--toast-bg);
+      background-color: #28a745;
       color: white;
       padding: 12px 20px;
       border-radius: 8px;
@@ -193,31 +180,9 @@
       opacity: 1;
       top: 40px;
     }
-
-    #theme-toggle {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 2001;
-      background: var(--link-bg);
-      color: var(--text);
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-      transition: background 0.3s, color 0.3s;
-    }
-
-    #theme-toggle:hover {
-      background: var(--link-hover);
-    }
   </style>
 </head>
 <body>
-
-  <!-- Přepínač tématu -->
-  <button id="theme-toggle">🌙 Světlý režim</button>
 
   <!-- Sidebar -->
   <div id="sidebar">
@@ -230,12 +195,10 @@
       <a href="https://instagram.com/jakubjvecera"
          data-copy="@jakubjvecera"
          target="_blank"
-         rel="noopener noreferrer"
          onclick="copyAndOpen(event, this)">Instagram</a>
       <a href="https://zonerama.com/jakubjvecera/"
          data-copy="jakubjvecera.zonerama.com"
          target="_blank"
-         rel="noopener noreferrer"
          onclick="copyAndOpen(event, this)">Zonerama</a>
     </div>
   </div>
@@ -248,22 +211,18 @@
   <!-- Lightbox -->
   <div id="lightbox"></div>
 
-  <!-- Toast -->
+  <!-- ✅ Zelený toast -->
   <div id="copy-toast">Zkopírováno do schránky!</div>
 
-  <!-- No JS fallback -->
+  <!-- ✅ Info pro bez JS -->
   <noscript>
     <div style="padding: 20px; color: white; background-color: #222; text-align: center;">
       ⚠️ Tato stránka vyžaduje JavaScript pro správné zobrazení galerie. Povolte JavaScript ve svém prohlížeči.
     </div>
   </noscript>
 
+  <script src="fotky.js"></script>
   <script>
-    const fotky = [
-      "foto1.jpg", "foto2.jpg", "foto3.jpg", "foto4.jpg", "foto5.jpg", 
-      "foto6.jpg", "foto7.jpg", "foto8.jpg"
-    ]; // Nahraď svými názvy souborů
-
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -279,7 +238,7 @@
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
       img.alt = src;
-      img.loading = "lazy";
+      img.loading = "lazy"; // ✅ lazy loading
       img.addEventListener('click', () => {
         lightbox.innerHTML = `<img src="fotos/${src}" alt="${src}">`;
         lightbox.style.display = 'flex';
@@ -312,13 +271,7 @@
         toast.classList.remove('show');
       }, 2500);
     }
-
-    const themeToggle = document.getElementById('theme-toggle');
-    themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('light');
-      const light = document.body.classList.contains('light');
-      themeToggle.textContent = light ? '🌙 Tmavý režim' : '🌞 Světlý režim';
-    });
   </script>
+
 </body>
 </html>
