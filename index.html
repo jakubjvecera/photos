@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png"> <!-- ✅ Apple fallback -->
   <title>Jakub Večeřa</title>
   <style>
     body {
@@ -158,7 +159,6 @@
       }
     }
 
-    /* ✅ Styl pro zelený toast */
     #copy-toast {
       position: fixed;
       top: 20px;
@@ -195,10 +195,12 @@
       <a href="https://instagram.com/jakubjvecera"
          data-copy="@jakubjvecera"
          target="_blank"
+         rel="noopener noreferrer"
          onclick="copyAndOpen(event, this)">Instagram</a>
       <a href="https://zonerama.com/jakubjvecera/"
          data-copy="jakubjvecera.zonerama.com"
          target="_blank"
+         rel="noopener noreferrer"
          onclick="copyAndOpen(event, this)">Zonerama</a>
     </div>
   </div>
@@ -238,7 +240,7 @@
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
       img.alt = src;
-      img.loading = "lazy"; // ✅ lazy loading
+      img.loading = "lazy";
       img.addEventListener('click', () => {
         lightbox.innerHTML = `<img src="fotos/${src}" alt="${src}">`;
         lightbox.style.display = 'flex';
