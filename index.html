@@ -250,6 +250,13 @@
       lightbox.style.display = 'none';
       lightbox.innerHTML = '';
     });
+    // Zavření lightboxu pomocí klávesy Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && lightbox.style.display === 'flex') {
+    lightbox.style.display = 'none';
+    lightbox.innerHTML = '';
+  }
+});
 
     function copyAndOpen(event, element) {
       event.preventDefault();
