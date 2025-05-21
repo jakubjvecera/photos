@@ -234,6 +234,14 @@
     const gallery = document.getElementById('gallery');
     const lightbox = document.getElementById('lightbox');
 
+    // Zablokuj pravé tlačítko na všech obrázcích v galerii
+gallery.addEventListener('contextmenu', (e) => {
+  if (e.target.tagName === 'IMG') {
+    e.preventDefault();
+  }
+});
+
+
     shuffle(fotky).forEach(src => {
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
