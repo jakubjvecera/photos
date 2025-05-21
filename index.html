@@ -267,7 +267,9 @@
       lightbox.innerHTML = `<img src="fotos/${imageElements[currentIndex]}" alt="" draggable="false">`;
     }
 
-    lightbox.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+  if (e.target === lightbox) closeLightbox();
+});
 
     document.addEventListener('keydown', (e) => {
       if (lightbox.style.display === 'flex') {
