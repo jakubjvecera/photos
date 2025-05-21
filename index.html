@@ -279,17 +279,38 @@
       }
     });
 
-    function copyAndOpen(event, element) {
-      event.preventDefault();
-      const urlToCopy = element.getAttribute('data-copy');
-      navigator.clipboard.writeText(urlToCopy).then(() => {
-        showCopyToast(`Zkopírováno: ${urlToCopy}`);
-        window.open(element.href, '_blank');
-      }).catch(err => {
-        console.error('Chyba při kopírování:', err);
-        window.open(element.href, '_blank');
-      });
-    }
+function copyAndOpen(event, element) {
+  event.preventDefault();
+  const urlToCopy = element.getAttribute('data-copy');
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(urlToCopy).then(() => {
+      showCopyToast(`Zkopírováno: ${urlToCopy}`);
+      window.open(element.href, '_blank');
+    }).catch(err => {
+      fallbackCopyText(urlToCopy);
+      window.open(element.href, '_blank');
+    });
+  } else {
+    fallbackCopyText(urlToCopy);
+    window.open(element.href, '_blank');
+  }
+}
+
+function fallbackCopyText(text) {
+  const tempInput = document.createElement("input");
+  tempInput.value = text;
+  document.body.appendChild(tempInput);
+  tempInput.select();
+  try {
+    document.execCommand("copy");
+    showCopyToast(`Zkopírováno (fallback): ${text}`);
+  } catch (err) {
+    console.error("Fallback kopírování selhalo", err);
+  }
+  document.body.removeChild(tempInput);
+}
+
 
     function showCopyToast(message) {
       const toast = document.getElementById('copy-toast');
