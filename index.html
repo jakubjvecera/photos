@@ -267,9 +267,7 @@
       lightbox.innerHTML = `<img src="fotos/${imageElements[currentIndex]}" alt="" draggable="false">`;
     }
 
-    lightbox.addEventListener('click', (e) => {
-  if (e.target === lightbox) closeLightbox();
-});
+    lightbox.addEventListener('click', closeLightbox);
 
     document.addEventListener('keydown', (e) => {
       if (lightbox.style.display === 'flex') {
@@ -279,7 +277,7 @@
       }
     });
 
-function copyAndOpen(event, element) {
+   function copyAndOpen(event, element) {
   event.preventDefault();
   const urlToCopy = element.getAttribute('data-copy');
 
