@@ -255,8 +255,9 @@ lightbox.addEventListener('contextmenu', (e) => {
       img.src = 'fotos/' + src;
       img.alt = src;
       img.loading = "lazy"; // ✅ lazy loading
+      img.draggable = false;
       img.addEventListener('click', () => {
-        lightbox.innerHTML = `<img src="fotos/${src}" alt="${src}">`;
+        lightbox.innerHTML = `<img src="fotos/${src}" alt="${src}" draggable="false">`;
         lightbox.style.display = 'flex';
       });
       gallery.appendChild(img);
