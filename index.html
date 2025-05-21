@@ -89,7 +89,7 @@
 
     #sidebar .links a:hover {
       background: #555;
-      transform: scale(1.02); /* ✅ Hover efekt */
+      transform: scale(1.02);
     }
 
     #gallery-container {
@@ -134,7 +134,7 @@
       align-items: center;
       z-index: 1100;
       cursor: pointer;
-      backdrop-filter: blur(4px); /* ✅ Efekt rozmazání */
+      backdrop-filter: blur(4px);
       transition: background 0.3s ease;
     }
 
@@ -224,7 +224,7 @@
 
     const gallery = document.getElementById('gallery');
     const lightbox = document.getElementById('lightbox');
-    let currentIndex = -1; // ✅ Pro pohyb v lightboxu
+    let currentIndex = -1;
 
     gallery.addEventListener('contextmenu', (e) => {
       if (e.target.tagName === 'IMG') e.preventDefault();
@@ -242,7 +242,7 @@
       img.alt = src;
       img.loading = "lazy";
       img.draggable = false;
-      img.ondragstart = () => false; // ✅ Zakázat přetahování
+      img.ondragstart = () => false;
       img.addEventListener('click', () => openLightbox(index));
       gallery.appendChild(img);
       imageElements.push(src);
@@ -252,13 +252,13 @@
       currentIndex = index;
       lightbox.innerHTML = `<img src="fotos/${imageElements[index]}" alt="" draggable="false">`;
       lightbox.style.display = 'flex';
-      document.body.style.overflow = 'hidden'; // ✅ Zákaz scrollování
+      document.body.style.overflow = 'hidden';
     }
 
     function closeLightbox() {
       lightbox.style.display = 'none';
       lightbox.innerHTML = '';
-      document.body.style.overflow = ''; // ✅ Obnovení scrollování
+      document.body.style.overflow = '';
     }
 
     function navigateLightbox(direction) {
@@ -271,9 +271,9 @@
 
     document.addEventListener('keydown', (e) => {
       if (lightbox.style.display === 'flex') {
-        if (e.key === 'Escape') closeLightbox(); // ✅ Escape zavře
-        else if (e.key === 'ArrowRight') navigateLightbox(1); // ✅ Další
-        else if (e.key === 'ArrowLeft') navigateLightbox(-1); // ✅ Předchozí
+        if (e.key === 'Escape') closeLightbox();
+        else if (e.key === 'ArrowRight') navigateLightbox(1);
+        else if (e.key === 'ArrowLeft') navigateLightbox(-1);
       }
     });
 
@@ -296,6 +296,27 @@
       setTimeout(() => {
         toast.classList.remove('show');
       }, 2500);
+    }
+
+    // Swipe gesta pro lightbox
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    lightbox.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    lightbox.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const deltaX = touchEndX - touchStartX;
+      if (Math.abs(deltaX) > 50) {
+        if (deltaX < 0) navigateLightbox(1); // vpravo
+        else navigateLightbox(-1); // vlevo
+      }
     }
   </script>
 </body>
