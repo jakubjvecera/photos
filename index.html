@@ -287,6 +287,8 @@ img.addEventListener('click', () => {
   lightbox.appendChild(enlargedImg);
   lightbox.style.display = 'flex';
   document.getElementById('gallery-container').classList.add('blur');
+document.getElementById('sidebar').classList.add('blur');
+
 
 
   const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
@@ -305,7 +307,9 @@ img.addEventListener('click', () => {
   document.body.style.overflow = '';
   document.body.style.paddingRight = '';
   document.removeEventListener('touchmove', disableScroll);
-  document.getElementById('gallery-container').classList.remove('blur');
+ document.getElementById('gallery-container').classList.remove('blur');
+document.getElementById('sidebar').classList.remove('blur');
+
 
 });
 
@@ -317,7 +321,9 @@ if (e.key === 'Escape' && lightbox.style.display === 'flex') {
   document.body.style.overflow = '';
   document.body.style.paddingRight = '';
   document.removeEventListener('touchmove', disableScroll);
-  document.getElementById('gallery-container').classList.remove('blur');
+ document.getElementById('gallery-container').classList.remove('blur');
+document.getElementById('sidebar').classList.remove('blur');
+
 }
     });
 
