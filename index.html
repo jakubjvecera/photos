@@ -19,8 +19,6 @@
       font-family: Courier, sans-serif;
       color: #eee;
       display: flex;
-      min-height: 100vh;
-      overflow-x: hidden;
     }
 
     #sidebar {
@@ -35,8 +33,7 @@
       top: 0;
       left: 0;
       bottom: 0;
-      z-index: 1100; /* vyšší než lightbox */
-      transition: width 0.3s ease;
+      z-index: 1001;
     }
 
     #sidebar h1 {
@@ -48,7 +45,12 @@
       letter-spacing: 2px;
       color: #ccc;
       user-select: none;
-      transition: opacity 0.3s ease;
+    }
+
+    @media (max-height: 500px) {
+      #sidebar h1 {
+        display: none;
+      }
     }
 
     #logo {
@@ -59,8 +61,13 @@
       height: auto;
       user-select: none;
       -webkit-user-drag: none;
-      z-index: 1101; /* nad sidebar textem */
-      transition: top 0.3s ease, left 0.3s ease;
+    }
+
+    @media (max-height: 500px) {
+      #logo {
+        top: 40px;
+        left: 20px;
+      }
     }
 
     #sidebar .links {
@@ -69,9 +76,6 @@
       gap: 10px;
       position: absolute;
       bottom: 20px;
-      width: 100%;
-      align-items: center;
-      z-index: 1101;
     }
 
     #sidebar .links a {
@@ -84,51 +88,30 @@
       text-align: center;
       transition: background 0.3s;
       user-select: none;
-      display: block;
-      width: 100%;
-      box-sizing: border-box;
     }
 
     #sidebar .links a:hover {
       background: #555;
     }
 
-    /* Galerie */
     #gallery-container {
       margin-left: 80px;
       padding: 20px;
       width: 100%;
       overflow-y: auto;
+    }
+
+    #gallery {
+      column-count: 4;
+      column-gap: 15px;
       max-width: 1200px;
-      margin-right: auto;
-      margin-left: auto;
-      display: flex;
-      gap: 15px;
-      justify-content: center;
-      box-sizing: border-box;
-      flex-wrap: nowrap;
-      transition: margin-left 0.3s ease;
+      margin: 0 auto;
     }
 
-    .gallery-column {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      min-width: 0;
-    }
-
-    .random-block {
-      background: #333;
-      border-radius: 8px;
-      user-select: none;
-      -webkit-user-drag: none;
-      width: 100%;
-    }
-
-    .gallery-column img {
+    #gallery img {
       width: 100%;
       height: auto;
+      margin-bottom: 15px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.7);
       cursor: pointer;
@@ -136,94 +119,62 @@
       display: block;
       user-select: none;
       -webkit-user-drag: none;
-      will-change: transform;
     }
 
+    /* Hover efekt pouze na zařízeních s podporou hover (desktop) */
     @media (hover: hover) and (pointer: fine) {
-      .gallery-column img:hover {
+      #gallery img:hover {
         transform: scale(1.05);
         box-shadow: 0 4px 16px rgba(255,255,255,0.8);
       }
     }
 
-    @media (max-width: 900px) {
-      #gallery-container {
-        max-width: 900px;
-      }
-    }
-
-    @media (max-width: 800px) {
-      #gallery-container {
-        flex-wrap: wrap;
-      }
-      .gallery-column {
-        flex: 0 0 48%;
-      }
-    }
-
-    @media (max-width: 600px) {
-      #gallery-container {
-        margin-left: 50px; /* odsunutí galerie pod menší sidebar */
-      }
-      #sidebar {
-        width: 50px;
-        padding: 15px 5px;
-      }
-      #sidebar h1 {
-        font-size: 24px;
-        opacity: 0; /* schováme text, aby byl prostor */
-        pointer-events: none;
-      }
-      #logo {
-        top: 60px;
-        left: 5px;
-        width: 30px;
-      }
-      .gallery-column {
-        flex: 0 0 100%;
-      }
-    }
-
-    @media (max-width: 400px) {
-      #gallery-container {
-        margin-left: 40px;
-        padding: 15px;
-      }
-      #sidebar {
-        width: 40px;
-        padding: 10px 5px;
-      }
-      #logo {
-        top: 50px;
-        left: 5px;
-        width: 25px;
-      }
-    }
-
-    /* Lightbox */
     #lightbox {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: rgba(0,0,0,0.85);
+      background: rgba(0, 0, 0, 0.6);
       display: none;
-      align-items: center;
       justify-content: center;
-      z-index: 1050; /* pod sidebar, ale nad galerií */
-      cursor: zoom-out;
+      align-items: center;
+      z-index: 1100;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-drag: none;
+      -webkit-touch-callout: none; /* dlouhé podržení */
+      -webkit-user-select: none; /* iOS */
+      -moz-user-select: none;
+      -ms-user-select: none;
       user-select: none;
     }
 
     #lightbox img {
       max-width: 90vw;
       max-height: 90vh;
-      border-radius: 8px;
-      box-shadow: 0 0 30px rgba(255,255,255,0.6);
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(255,255,255,0.8);
       user-select: none;
       -webkit-user-drag: none;
-      cursor: default;
+    }
+
+    @media (max-width: 900px) {
+      #gallery {
+        column-count: 3;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #gallery {
+        column-count: 2;
+      }
+    }
+
+    @media (max-width: 400px) {
+      #gallery {
+        column-count: 1;
+      }
     }
 
     /* ✅ Styl pro zelený toast */
@@ -241,13 +192,12 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease, top 0.3s ease;
-      z-index: 1200; /* nejvýše */
+      z-index: 2000;
     }
 
     #copy-toast.show {
       opacity: 1;
       top: 40px;
-      pointer-events: auto;
     }
   </style>
 </head>
@@ -272,16 +222,13 @@
     </div>
   </div>
 
-  <!-- Galerie container s 4 sloupci -->
+  <!-- Galerie -->
   <div id="gallery-container">
-    <div class="gallery-column" id="col-0"></div>
-    <div class="gallery-column" id="col-1"></div>
-    <div class="gallery-column" id="col-2"></div>
-    <div class="gallery-column" id="col-3"></div>
+    <div id="gallery"></div>
   </div>
 
   <!-- Lightbox -->
-  <div id="lightbox" tabindex="0" role="dialog" aria-modal="true" aria-label="Zvětšená fotografie"></div>
+  <div id="lightbox"></div>
 
   <!-- ✅ Zelený toast -->
   <div id="copy-toast">Zkopírováno do schránky!</div>
@@ -303,78 +250,70 @@
       return array;
     }
 
-    const galleryColumns = [
-      document.getElementById('col-0'),
-      document.getElementById('col-1'),
-      document.getElementById('col-2'),
-      document.getElementById('col-3'),
-    ];
-
-    // Přidání náhodně vysokého bloku nad každý sloupec
-    galleryColumns.forEach(col => {
-      const block = document.createElement('div');
-      block.classList.add('random-block');
-      block.style.height = (50 + Math.random() * 250) + 'px';
-      col.appendChild(block);
-    });
-
-    // Přidání obrázků do sloupců (fotky jsou v proměnné 'photos' z fotky.js)
-    // Distribuce do sloupců střídavě
-    photos.forEach((photo, i) => {
-      const img = document.createElement('img');
-      img.src = photo.src;
-      img.alt = photo.title || 'Foto';
-      img.loading = 'lazy';
-      img.setAttribute('tabindex', '0');
-      img.draggable = false;
-      img.addEventListener('click', () => {
-        openLightbox(photo.src, photo.title);
-      });
-      img.addEventListener('keydown', (e) => {
-        if(e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          openLightbox(photo.src, photo.title);
-        }
-      });
-      galleryColumns[i % galleryColumns.length].appendChild(img);
-    });
-
+    const gallery = document.getElementById('gallery');
     const lightbox = document.getElementById('lightbox');
 
-    function openLightbox(src, alt) {
-      lightbox.innerHTML = '';
+    function disableImageInteractions(img) {
+      img.addEventListener('contextmenu', e => e.preventDefault());
+      img.addEventListener('dragstart', e => e.preventDefault());
+      img.addEventListener('selectstart', e => e.preventDefault());
+      img.style.userSelect = "none";
+      img.style.webkitUserDrag = "none";
+    }
+
+    function disableScroll(e) {
+      e.preventDefault();
+    }
+
+    shuffle(fotky).forEach(src => {
       const img = document.createElement('img');
-      img.src = src;
-      img.alt = alt || '';
-      lightbox.appendChild(img);
-      lightbox.style.display = 'flex';
-      lightbox.focus();
-    }
+      img.src = 'fotos/' + src;
+      img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
+      img.loading = "lazy";
+      img.draggable = false;
+      disableImageInteractions(img);
 
-    function closeLightbox() {
-      lightbox.style.display = 'none';
-      lightbox.innerHTML = '';
-    }
+      img.addEventListener('click', () => {
+        lightbox.innerHTML = '';
+        const enlargedImg = document.createElement('img');
+        enlargedImg.src = 'fotos/' + src;
+        enlargedImg.alt = 'Zvětšená fotografie';
+        enlargedImg.draggable = false;
+        disableImageInteractions(enlargedImg);
+        lightbox.appendChild(enlargedImg);
+        lightbox.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        document.addEventListener('touchmove', disableScroll, { passive: false });
+      });
 
-    lightbox.addEventListener('click', e => {
-      if(e.target === lightbox) closeLightbox();
+      gallery.appendChild(img);
     });
 
-    document.addEventListener('keydown', e => {
-      if(e.key === 'Escape') closeLightbox();
+    lightbox.addEventListener('click', () => {
+      lightbox.style.display = 'none';
+      lightbox.innerHTML = '';
+      document.body.style.overflow = '';
+      document.removeEventListener('touchmove', disableScroll);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.style.display === 'flex') {
+        lightbox.style.display = 'none';
+        lightbox.innerHTML = '';
+        document.body.style.overflow = '';
+        document.removeEventListener('touchmove', disableScroll);
+      }
     });
 
     function copyAndOpen(event, element) {
       event.preventDefault();
-      const copyText = element.getAttribute('data-copy');
-      if (!copyText) return;
-
-      navigator.clipboard.writeText(copyText).then(() => {
-        showCopyToast(`Zkopírováno: ${copyText}`);
-        const href = element.href;
-        if (href && href !== '#') {
-          window.open(href, '_blank', 'noopener');
-        }
+      const urlToCopy = element.getAttribute('data-copy');
+      navigator.clipboard.writeText(urlToCopy).then(() => {
+        showCopyToast(`Zkopírováno: ${urlToCopy}`);
+        window.open(element.href, '_blank');
+      }).catch(err => {
+        console.error('Chyba při kopírování:', err);
+        window.open(element.href, '_blank');
       });
     }
 
@@ -382,8 +321,11 @@
       const toast = document.getElementById('copy-toast');
       toast.textContent = message;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
     }
   </script>
+
 </body>
 </html>
