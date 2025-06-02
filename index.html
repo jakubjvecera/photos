@@ -150,6 +150,9 @@
       z-index: 1100;
       cursor: pointer;
       user-select: none;
+        opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
     }
     /* Fade in animace */
 @keyframes fadeIn {
@@ -161,12 +164,6 @@
 @keyframes fadeOut {
   from { opacity: 1; }
   to { opacity: 0; }
-}
-
-#lightbox {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
 }
 
 #lightbox.show {
