@@ -18,7 +18,6 @@
       );
       font-family: Courier, sans-serif;
       color: #eee;
-      display: flex;
       overflow-x: hidden; /* Zabrání horizontálnímu scrollu */
     }
 
@@ -98,22 +97,29 @@
     #gallery-container {
       margin-left: 80px;
       padding: 20px;
-      width: 100%;
+      width: calc(100vw - 80px);
       overflow-y: auto;
-      overflow-x: hidden; /* Zabrání horizontálnímu scrollu i zde */
+      overflow-x: hidden; /* Zabrání horizontálnímu scrollu */
     }
 
     #gallery {
-      column-count: 4;
-      column-gap: 15px;
+      display: flex;
+      gap: 15px; /* mezera mezi sloupci */
       max-width: 1200px;
       margin: 0 auto;
+    }
+
+    .column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 15px; /* mezera mezi fotkami */
+      margin-top: 0; /* default */
     }
 
     #gallery img {
       width: 100%;
       height: auto;
-      margin: 0 0 15px 0; /* mezera pod fotkou */
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.7);
       cursor: pointer;
@@ -123,7 +129,7 @@
       -webkit-user-drag: none;
     }
 
-    /* Hover efekt pouze na zařízeních s podporou hover (desktop) */
+    /* Hover efekt na desktopu */
     @media (hover: hover) and (pointer: fine) {
       #gallery img:hover {
         transform: scale(1.05);
@@ -131,32 +137,7 @@
       }
     }
 
-    /* Posuny sloupců */
-    #gallery > div {
-      display: inline-block;
-      vertical-align: top;
-      width: 100%;
-    }
-
-    @media (max-width: 900px) {
-      #gallery {
-        column-count: 3;
-      }
-    }
-
-    @media (max-width: 600px) {
-      #gallery {
-        column-count: 2;
-      }
-    }
-
-    @media (max-width: 400px) {
-      #gallery {
-        column-count: 1;
-      }
-    }
-
-    /* ✅ Styl pro zelený toast */
+    /* Toast styl */
     #copy-toast {
       position: fixed;
       top: 20px;
@@ -209,10 +190,10 @@
   <!-- Lightbox -->
   <div id="lightbox"></div>
 
-  <!-- ✅ Zelený toast -->
+  <!-- Toast -->
   <div id="copy-toast">Zkopírováno do schránky!</div>
 
-  <!-- ✅ Info pro bez JS -->
+  <!-- Bez JS -->
   <noscript>
     <div style="padding: 20px; color: white; background-color: #222; text-align: center;">
       ⚠️ Tato stránka vyžaduje JavaScript pro správné zobrazení galerie. Povolte JavaScript ve svém prohlížeči.
@@ -230,32 +211,18 @@
     }
 
     const gallery = document.getElementById('gallery');
-    const lightbox = document.getElementById('lightbox');
+    const columnCount = 4;
 
-    function disableImageInteractions(img) {
-      img.addEventListener('contextmenu', e => e.preventDefault());
-      img.addEventListener('dragstart', e => e.preventDefault());
-      img.addEventListener('selectstart', e => e.preventDefault());
-      img.style.userSelect = "none";
-      img.style.webkitUserDrag = "none";
-    }
-
-    function disableScroll(e) {
-      e.preventDefault();
-    }
-
-    // Funkce pro vytvoření sloupců s náhodným posunem dolů
+    // Vytvoří sloupce a přidá náhodný margin-top
     function createColumns(images, count) {
       const columns = [];
       for(let i=0; i<count; i++) {
         const col = document.createElement('div');
-        col.style.marginTop = Math.floor(Math.random() * 101) + 'px'; // 0-100px posun
-        col.style.width = (100 / count) + '%';
-        col.style.display = 'inline-block';
-        col.style.verticalAlign = 'top';
+        col.className = 'column';
+        col.style.marginTop = Math.floor(Math.random() * 101) + 'px'; // náhodný posun 0-100px
         columns.push(col);
+        gallery.appendChild(col);
       }
-
       images.forEach((src, idx) => {
         const img = document.createElement('img');
         img.src = 'fotos/' + src;
@@ -265,15 +232,21 @@
         disableImageInteractions(img);
         columns[idx % count].appendChild(img);
       });
-
-      return columns;
     }
 
-    // Vytvoření a přidání sloupců do galerie
+    function disableImageInteractions(img) {
+      img.addEventListener('contextmenu', e => e.preventDefault());
+      img.addEventListener('dragstart', e => e.preventDefault());
+      img.addEventListener('selectstart', e => e.preventDefault());
+      img.style.userSelect = "none";
+      img.style.webkitUserDrag = "none";
+    }
+
     const shuffledImages = shuffle(fotky);
-    const columnCount = 4;
-    const columns = createColumns(shuffledImages, columnCount);
-    columns.forEach(col => gallery.appendChild(col));
+    createColumns(shuffledImages, columnCount);
+
+    // Toast a kopírování
+    const lightbox = document.getElementById('lightbox');
 
     lightbox.addEventListener('click', () => {
       lightbox.style.display = 'none';
@@ -310,6 +283,10 @@
       setTimeout(() => {
         toast.classList.remove('show');
       }, 2500);
+    }
+
+    function disableScroll(e) {
+      e.preventDefault();
     }
   </script>
 
