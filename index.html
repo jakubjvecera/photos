@@ -36,6 +36,7 @@
       left: 0;
       bottom: 0;
       z-index: 1100; /* vyšší než lightbox */
+      box-sizing: border-box;
     }
 
     #sidebar h1 {
@@ -105,18 +106,46 @@
 
     /* Galerie */
     #gallery-container {
-      margin-left: 80px;
+      margin-left: 80px; /* zajišťuje prostor pro sidebar i na desktopu */
       padding: 20px;
       width: 100%;
       overflow-y: auto;
       max-width: 1200px;
       margin-right: auto;
-      margin-left: auto;
+      margin-left: auto; /* resetujeme margin-left na auto, nahradíme margin-left: 80px níže */
       display: flex;
       gap: 15px;
       justify-content: center;
       box-sizing: border-box;
       flex-wrap: nowrap;
+      transition: margin-left 0.3s ease;
+    }
+
+    /* Na desktopu galerie odsazená o 80px (sidebar) */
+    @media (min-width: 801px) {
+      #gallery-container {
+        margin-left: 80px;
+      }
+    }
+
+    /* Na menších obrazovkách margin-left místo auto, aby galerie nezačínala pod sidebar */
+    @media (max-width: 800px) {
+      #gallery-container {
+        margin-left: 80px;
+        flex-wrap: wrap;
+      }
+      .gallery-column {
+        flex: 0 0 48%;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #gallery-container {
+        margin-left: 80px;
+      }
+      .gallery-column {
+        flex: 0 0 100%;
+      }
     }
 
     .gallery-column {
@@ -152,27 +181,6 @@
       .gallery-column img:hover {
         transform: scale(1.05);
         box-shadow: 0 4px 16px rgba(255,255,255,0.8);
-      }
-    }
-
-    @media (max-width: 900px) {
-      #gallery-container {
-        max-width: 900px;
-      }
-    }
-
-    @media (max-width: 800px) {
-      #gallery-container {
-        flex-wrap: wrap;
-      }
-      .gallery-column {
-        flex: 0 0 48%;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .gallery-column {
-        flex: 0 0 100%;
       }
     }
 
@@ -300,60 +308,68 @@
       e.preventDefault();
     }
 
-    shuffle(fotky);
-
-    // Přidej náhodný blok nad každý sloupec
-    galleryColumns.forEach(col => {
-      const block = document.createElement('div');
-      block.className = 'random-block';
-      block.style.height = (100 + Math.floor(Math.random() * 200)) + 'px';
-      col.appendChild(block);
-    });
-
-    // Rozděl fotky rovnoměrně do sloupců
-    fotky.forEach((src, index) => {
+    function showLightbox(src, alt) {
+      lightbox.innerHTML = '';
       const img = document.createElement('img');
-      img.src = 'fotos/' + src;
-      img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
-      img.loading = "lazy";
-      img.draggable = false;
+      img.src = src;
+      img.alt = alt || '';
       disableImageInteractions(img);
+      lightbox.appendChild(img);
+      lightbox.style.display = 'flex';
+      document.body.style.overflow = 'hidden'; // zakáže scroll těla při lightboxu
+      lightbox.focus();
+    }
 
-      img.addEventListener('click', () => {
-        // Vyčistit lightbox, vložit zvětšený obrázek a zobrazit
-        lightbox.innerHTML = '';
-        const enlargedImg = document.createElement('img');
-        enlargedImg.src = 'fotos/' + src;
-        enlargedImg.alt = 'Zvětšená fotografie';
-        enlargedImg.draggable = false;
-        disableImageInteractions(enlargedImg);
-        lightbox.appendChild(enlargedImg);
-        lightbox.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        document.addEventListener('touchmove', disableScroll, { passive: false });
-        lightbox.focus();
-      });
-
-      const colIndex = index % 4;
-      galleryColumns[colIndex].appendChild(img);
-    });
-
-    // Zavření lightboxu na klik
-    lightbox.addEventListener('click', () => {
+    function hideLightbox() {
       lightbox.style.display = 'none';
       lightbox.innerHTML = '';
-      document.body.style.overflow = '';
-      document.removeEventListener('touchmove', disableScroll);
+      document.body.style.overflow = ''; // obnoví scroll
+    }
+
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) {
+        hideLightbox();
+      }
     });
 
-    // Zavření lightboxu ESC
-    document.addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && lightbox.style.display === 'flex') {
-        lightbox.style.display = 'none';
-        lightbox.innerHTML = '';
-        document.body.style.overflow = '';
-        document.removeEventListener('touchmove', disableScroll);
+        hideLightbox();
       }
+    });
+
+    // Přidání fotek do sloupců, nad každý sloupec náhodný blok
+    function createRandomBlock() {
+      const block = document.createElement('div');
+      block.className = 'random-block';
+      block.style.height = `${50 + Math.floor(Math.random() * 150)}px`;
+      return block;
+    }
+
+    function loadGallery() {
+      // nad každý sloupec přidat náhodný blok
+      galleryColumns.forEach(col => {
+        const randomBlock = createRandomBlock();
+        col.appendChild(randomBlock);
+      });
+
+      // Načti fotky ze zdroje fotky (proměnná photos předpokládaná v fotky.js)
+      photos.forEach((photo, i) => {
+        const img = document.createElement('img');
+        img.src = photo.thumb;
+        img.alt = photo.description || `Fotka ${i + 1}`;
+        img.loading = 'lazy';
+        disableImageInteractions(img);
+        img.addEventListener('click', () => showLightbox(photo.full, img.alt));
+
+        // Rozdělení do sloupců podle indexu
+        const colIndex = i % galleryColumns.length;
+        galleryColumns[colIndex].appendChild(img);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadGallery();
     });
 
     function copyAndOpen(event, element) {
