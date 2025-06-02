@@ -285,7 +285,7 @@ img.addEventListener('click', () => {
 
   const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
   document.body.style.paddingRight = scrollBarWidth + 'px';
- // document.body.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
 
   document.addEventListener('touchmove', disableScroll, { passive: false });
 });
