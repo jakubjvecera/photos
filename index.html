@@ -19,6 +19,8 @@
       font-family: Courier, sans-serif;
       color: #eee;
       display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
     #sidebar {
@@ -48,7 +50,7 @@
     }
 
     @media (max-height: 500px) {
-      #sidebar h1, #logo {
+      #sidebar h1 {
         display: none;
       }
     }
@@ -99,26 +101,29 @@
       padding: 20px;
       width: 100%;
       overflow-y: auto;
+      flex-grow: 1;
     }
 
-    /* Grid místo column-count */
+    /* Galerie jako flex container */
     #gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      display: flex;
       gap: 15px;
       max-width: 1200px;
       margin: 0 auto;
     }
 
-    #gallery .column {
+    /* Sloupce v galerii */
+    #gallery > div {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 0; /* žádné mezery mezi fotkami v rámci sloupce */
     }
 
     #gallery img {
       width: 100%;
       height: auto;
+      margin-bottom: 0; /* už není potřeba mezera */
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.7);
       cursor: pointer;
@@ -128,7 +133,7 @@
       -webkit-user-drag: none;
     }
 
-    /* Hover efekt pouze na zařízeních s podporou hover (desktop) */
+    /* Hover efekt jen na desktopu */
     @media (hover: hover) and (pointer: fine) {
       #gallery img:hover {
         transform: scale(1.05);
@@ -150,8 +155,8 @@
       cursor: pointer;
       user-select: none;
       -webkit-user-drag: none;
-      -webkit-touch-callout: none; /* dlouhé podržení */
-      -webkit-user-select: none; /* iOS */
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
@@ -164,6 +169,29 @@
       box-shadow: 0 0 30px rgba(255,255,255,0.8);
       user-select: none;
       -webkit-user-drag: none;
+    }
+
+    @media (max-width: 900px) {
+      #gallery {
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      #gallery {
+        flex-wrap: wrap;
+      }
+      #gallery > div {
+        flex: 0 0 48%;
+        margin-bottom: 15px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      #gallery > div {
+        flex: 0 0 100%;
+        margin-bottom: 15px;
+      }
     }
 
     /* ✅ Styl pro zelený toast */
@@ -188,7 +216,6 @@
       opacity: 1;
       top: 40px;
     }
-
   </style>
 </head>
 <body>
@@ -231,7 +258,7 @@
   </noscript>
 
   <script>
-    // Příklad seznamu fotek - uprav si dle potřeby
+    // Tvoje pole fotek (příklad)
     const fotky = [
       'photo1.jpg',
       'photo2.jpg',
@@ -242,7 +269,9 @@
       'photo7.jpg',
       'photo8.jpg',
       'photo9.jpg',
-      'photo10.jpg'
+      'photo10.jpg',
+      'photo11.jpg',
+      'photo12.jpg'
     ];
 
     function shuffle(array) {
@@ -256,14 +285,6 @@
     const gallery = document.getElementById('gallery');
     const lightbox = document.getElementById('lightbox');
 
-    // Nastaví počet sloupců podle šířky okna
-    function getColumnsCount() {
-      if (window.innerWidth < 400) return 1;
-      if (window.innerWidth < 600) return 2;
-      if (window.innerWidth < 900) return 3;
-      return 4;
-    }
-
     function disableImageInteractions(img) {
       img.addEventListener('contextmenu', e => e.preventDefault());
       img.addEventListener('dragstart', e => e.preventDefault());
@@ -276,49 +297,58 @@
       e.preventDefault();
     }
 
-    function renderGallery() {
+    function createGallery() {
+      const columnsCount = 4;
+
+      // Zamícháme fotky
+      shuffle(fotky);
+
+      // Rozdělíme fotky do sloupců
+      const columns = Array.from({ length: columnsCount }, () => []);
+
+      fotky.forEach((src, i) => {
+        columns[i % columnsCount].push(src);
+      });
+
       gallery.innerHTML = '';
 
-      const columnsCount = getColumnsCount();
-      const columns = [];
+      columns.forEach(columnFotos => {
+        const colDiv = document.createElement('div');
+        colDiv.style.display = 'flex';
+        colDiv.style.flexDirection = 'column';
+        colDiv.style.gap = '0px';
 
-      // Vytvoření sloupců s náhodným padding-top
-      for (let i = 0; i < columnsCount; i++) {
-        const col = document.createElement('div');
-        col.classList.add('column');
-        col.style.paddingTop = Math.floor(Math.random() * 100) + 'px';
-        gallery.appendChild(col);
-        columns.push(col);
-      }
+        // Náhodný posun sloupce
+        const randomShift = Math.floor(Math.random() * 101);
+        colDiv.style.marginTop = randomShift + 'px';
 
-      shuffle(fotky).forEach((src, index) => {
-        const img = document.createElement('img');
-        img.src = 'fotos/' + src;
-        img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
-        img.loading = "lazy";
-        img.draggable = false;
-        disableImageInteractions(img);
+        columnFotos.forEach(src => {
+          const img = document.createElement('img');
+          img.src = 'fotos/' + src;
+          img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
+          img.loading = "lazy";
+          img.draggable = false;
+          disableImageInteractions(img);
 
-        img.addEventListener('click', () => {
-          lightbox.innerHTML = '';
-          const enlargedImg = document.createElement('img');
-          enlargedImg.src = 'fotos/' + src;
-          enlargedImg.alt = 'Zvětšená fotografie';
-          enlargedImg.draggable = false;
-          disableImageInteractions(enlargedImg);
-          lightbox.appendChild(enlargedImg);
-          lightbox.style.display = 'flex';
-          document.body.style.overflow = 'hidden';
-          document.addEventListener('touchmove', disableScroll, { passive: false });
+          img.addEventListener('click', () => {
+            lightbox.innerHTML = '';
+            const enlargedImg = document.createElement('img');
+            enlargedImg.src = 'fotos/' + src;
+            enlargedImg.alt = 'Zvětšená fotografie';
+            enlargedImg.draggable = false;
+            disableImageInteractions(enlargedImg);
+            lightbox.appendChild(enlargedImg);
+            lightbox.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            document.addEventListener('touchmove', disableScroll, { passive: false });
+          });
+
+          colDiv.appendChild(img);
         });
 
-        const colIndex = index % columnsCount;
-        columns[colIndex].appendChild(img);
+        gallery.appendChild(colDiv);
       });
     }
-
-    window.addEventListener('resize', renderGallery);
-    window.addEventListener('load', renderGallery);
 
     lightbox.addEventListener('click', () => {
       lightbox.style.display = 'none';
@@ -336,30 +366,29 @@
       }
     });
 
-    // Kopírování emailu/insta/zonerama s toastem
-    function copyAndOpen(event, elem) {
+    function copyAndOpen(event, element) {
       event.preventDefault();
-      const copyText = elem.dataset.copy;
-      navigator.clipboard.writeText(copyText).then(() => {
-        showToast();
-        if (elem.href.startsWith('mailto:') || elem.target === '_blank') {
-          window.open(elem.href, '_blank');
-        } else {
-          window.location.href = elem.href;
-        }
-      }).catch(() => {
-        // fallback
-        alert('Nelze zkopírovat do schránky.');
+      const urlToCopy = element.getAttribute('data-copy');
+      navigator.clipboard.writeText(urlToCopy).then(() => {
+        showCopyToast(`Zkopírováno: ${urlToCopy}`);
+        window.open(element.href, '_blank');
+      }).catch(err => {
+        console.error('Chyba při kopírování:', err);
+        window.open(element.href, '_blank');
       });
     }
 
-    function showToast() {
+    function showCopyToast(message) {
       const toast = document.getElementById('copy-toast');
+      toast.textContent = message;
       toast.classList.add('show');
       setTimeout(() => {
         toast.classList.remove('show');
-      }, 1500);
+      }, 2500);
     }
+
+    // Inicializace galerie
+    createGallery();
   </script>
 </body>
 </html>
