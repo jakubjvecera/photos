@@ -317,15 +317,18 @@ img.addEventListener('click', () => {
   lightbox.classList.add('hide');
 
   // Po animaci fadeOut schováme lightbox a vyčistíme obsah
-  setTimeout(() => {
-    lightbox.style.display = 'none';
-    lightbox.innerHTML = '';
-    document.body.style.overflow = '';
-    document.body.style.paddingRight = '';
-    document.removeEventListener('touchmove', disableScroll);
-    document.getElementById('gallery-container').classList.remove('blur');
-    document.getElementById('sidebar').classList.remove('blur');
-  }, 300); // délka animace v ms
+// Odstranit blur HNED při zahájení zavírání
+document.getElementById('gallery-container').classList.remove('blur');
+document.getElementById('sidebar').classList.remove('blur');
+
+setTimeout(() => {
+  lightbox.style.display = 'none';
+  lightbox.innerHTML = '';
+  document.body.style.overflow = '';
+  document.body.style.paddingRight = '';
+  document.removeEventListener('touchmove', disableScroll);
+}, 300);
+ // délka animace v ms
 }
 
 lightbox.addEventListener('click', closeLightbox);
