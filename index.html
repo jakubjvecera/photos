@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="icon.png" type="image/png" />
   <title>Jakub Večeřa</title>
   <style>
+    /* (sem vlož stejný CSS jako předtím) */
     body {
       margin: 0;
       background-color: #121212;
@@ -104,7 +104,6 @@
       flex-grow: 1;
     }
 
-    /* Galerie jako flex container */
     #gallery {
       display: flex;
       gap: 15px;
@@ -112,18 +111,17 @@
       margin: 0 auto;
     }
 
-    /* Sloupce v galerii */
     #gallery > div {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 0; /* žádné mezery mezi fotkami v rámci sloupce */
+      gap: 0;
     }
 
     #gallery img {
       width: 100%;
       height: auto;
-      margin-bottom: 0; /* už není potřeba mezera */
+      margin-bottom: 0;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.7);
       cursor: pointer;
@@ -133,7 +131,6 @@
       -webkit-user-drag: none;
     }
 
-    /* Hover efekt jen na desktopu */
     @media (hover: hover) and (pointer: fine) {
       #gallery img:hover {
         transform: scale(1.05);
@@ -194,7 +191,6 @@
       }
     }
 
-    /* ✅ Styl pro zelený toast */
     #copy-toast {
       position: fixed;
       top: 20px;
@@ -220,7 +216,6 @@
 </head>
 <body>
 
-  <!-- Sidebar -->
   <div id="sidebar">
     <h1>Jakub Večeřa</h1>
     <img src="logo.png" alt="Logo" id="logo" />
@@ -239,40 +234,28 @@
     </div>
   </div>
 
-  <!-- Galerie -->
   <div id="gallery-container">
     <div id="gallery"></div>
   </div>
 
-  <!-- Lightbox -->
   <div id="lightbox"></div>
 
-  <!-- ✅ Zelený toast -->
   <div id="copy-toast">Zkopírováno do schránky!</div>
 
-  <!-- ✅ Info pro bez JS -->
   <noscript>
     <div style="padding: 20px; color: white; background-color: #222; text-align: center;">
       ⚠️ Tato stránka vyžaduje JavaScript pro správné zobrazení galerie. Povolte JavaScript ve svém prohlížeči.
     </div>
   </noscript>
 
+  <!-- Import fotky.js -->
+  <script src="fotky.js"></script>
+
   <script>
-    // Tvoje pole fotek (příklad)
-    const fotky = [
-      'photo1.jpg',
-      'photo2.jpg',
-      'photo3.jpg',
-      'photo4.jpg',
-      'photo5.jpg',
-      'photo6.jpg',
-      'photo7.jpg',
-      'photo8.jpg',
-      'photo9.jpg',
-      'photo10.jpg',
-      'photo11.jpg',
-      'photo12.jpg'
-    ];
+    // Tady už předpokládáme, že 'fotky' je globální pole z fotky.js
+
+    const gallery = document.getElementById('gallery');
+    const lightbox = document.getElementById('lightbox');
 
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
@@ -281,9 +264,6 @@
       }
       return array;
     }
-
-    const gallery = document.getElementById('gallery');
-    const lightbox = document.getElementById('lightbox');
 
     function disableImageInteractions(img) {
       img.addEventListener('contextmenu', e => e.preventDefault());
@@ -298,15 +278,20 @@
     }
 
     function createGallery() {
+      if (!Array.isArray(fotky)) {
+        console.error('Pole fotky není definováno!');
+        return;
+      }
+
       const columnsCount = 4;
 
-      // Zamícháme fotky
-      shuffle(fotky);
+      // Zamícháme fotky (kopie pole)
+      const shuffled = shuffle(fotky.slice());
 
       // Rozdělíme fotky do sloupců
       const columns = Array.from({ length: columnsCount }, () => []);
 
-      fotky.forEach((src, i) => {
+      shuffled.forEach((src, i) => {
         columns[i % columnsCount].push(src);
       });
 
@@ -318,7 +303,6 @@
         colDiv.style.flexDirection = 'column';
         colDiv.style.gap = '0px';
 
-        // Náhodný posun sloupce
         const randomShift = Math.floor(Math.random() * 101);
         colDiv.style.marginTop = randomShift + 'px';
 
@@ -387,8 +371,9 @@
       }, 2500);
     }
 
-    // Inicializace galerie
-    createGallery();
+    // Spustíme galerii, až bude načtený fotky.js
+    window.addEventListener('load', createGallery);
   </script>
+
 </body>
 </html>
