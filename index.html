@@ -121,9 +121,12 @@
       -webkit-user-drag: none;
     }
 
-    #gallery img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 16px rgba(255,255,255,0.8);
+    /* Hover efekt pouze na zařízeních s podporou hover (desktop) */
+    @media (hover: hover) and (pointer: fine) {
+      #gallery img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 16px rgba(255,255,255,0.8);
+      }
     }
 
     #lightbox {
