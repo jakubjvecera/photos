@@ -293,7 +293,7 @@ img.addEventListener('click', () => {
   enlargedImg.draggable = false;
   disableImageInteractions(enlargedImg);
   lightbox.appendChild(enlargedImg);
-  
+  lightbox.style.display = 'flex'; 
   // Přidáme třídu show a odstraníme hide
   lightbox.classList.remove('hide');
   lightbox.classList.add('show');
