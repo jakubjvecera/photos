@@ -265,6 +265,27 @@
       e.preventDefault();
     }
 
+    // Vytvoří náhodný blok nad sloupec
+    function createRandomBlock() {
+      const block = document.createElement('div');
+      block.style.width = (Math.random() * 80 + 40) + '%'; // šířka 40–120 %
+      block.style.height = (Math.random() * 60 + 20) + 'px'; // výška 20–80 px
+      block.style.backgroundColor = '#333';
+      block.style.marginBottom = '15px';
+      block.style.borderRadius = '8px';
+      block.style.transition = 'all 0.3s ease';
+      block.style.userSelect = 'none';
+      return block;
+    }
+
+    // Nejprve přidáme 4 náhodné bloky nad galerii
+    const randomBlocks = [];
+    for (let i = 0; i < 4; i++) {
+      randomBlocks.push(createRandomBlock());
+    }
+    randomBlocks.forEach(block => gallery.appendChild(block));
+
+    // Nyní přidáme fotky
     shuffle(fotky).forEach(src => {
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
@@ -285,7 +306,6 @@
         document.body.style.overflow = 'hidden';
         document.addEventListener('touchmove', disableScroll, { passive: false });
       });
-
       gallery.appendChild(img);
     });
 
@@ -296,36 +316,23 @@
       document.removeEventListener('touchmove', disableScroll);
     });
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && lightbox.style.display === 'flex') {
-        lightbox.style.display = 'none';
-        lightbox.innerHTML = '';
-        document.body.style.overflow = '';
-        document.removeEventListener('touchmove', disableScroll);
-      }
-    });
-
+    // Toast funkce
+    const copyToast = document.getElementById('copy-toast');
     function copyAndOpen(event, element) {
       event.preventDefault();
-      const urlToCopy = element.getAttribute('data-copy');
-      navigator.clipboard.writeText(urlToCopy).then(() => {
-        showCopyToast(`Zkopírováno: ${urlToCopy}`);
-        window.open(element.href, '_blank');
-      }).catch(err => {
-        console.error('Chyba při kopírování:', err);
-        window.open(element.href, '_blank');
+      const textToCopy = element.getAttribute('data-copy');
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        copyToast.classList.add('show');
+        setTimeout(() => copyToast.classList.remove('show'), 2000);
       });
-    }
-
-    function showCopyToast(message) {
-      const toast = document.getElementById('copy-toast');
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2500);
+      // Otevřít odkaz v novém okně, pokud je target="_blank"
+      const href = element.getAttribute('href');
+      if (element.target === '_blank') {
+        window.open(href, '_blank', 'noopener');
+      } else {
+        window.location.href = href;
+      }
     }
   </script>
-
 </body>
 </html>
