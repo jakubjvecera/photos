@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jakub Večeřa</title>
   <style>
-    /* (sem vlož stejný CSS jako předtím) */
     body {
       margin: 0;
       background-color: #121212;
@@ -115,13 +114,12 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 0;
+      gap: 15px; /* Zde je mezera mezi fotkami ve sloupci */
     }
 
     #gallery img {
       width: 100%;
       height: auto;
-      margin-bottom: 0;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.7);
       cursor: pointer;
@@ -129,6 +127,7 @@
       display: block;
       user-select: none;
       -webkit-user-drag: none;
+      margin-bottom: 0; /* margin-bottom odstraněn, gap dělá práci */
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -252,8 +251,6 @@
   <script src="fotky.js"></script>
 
   <script>
-    // Tady už předpokládáme, že 'fotky' je globální pole z fotky.js
-
     const gallery = document.getElementById('gallery');
     const lightbox = document.getElementById('lightbox');
 
@@ -285,10 +282,8 @@
 
       const columnsCount = 4;
 
-      // Zamícháme fotky (kopie pole)
       const shuffled = shuffle(fotky.slice());
 
-      // Rozdělíme fotky do sloupců
       const columns = Array.from({ length: columnsCount }, () => []);
 
       shuffled.forEach((src, i) => {
@@ -301,7 +296,7 @@
         const colDiv = document.createElement('div');
         colDiv.style.display = 'flex';
         colDiv.style.flexDirection = 'column';
-        colDiv.style.gap = '0px';
+        colDiv.style.gap = '15px'; // mezera mezi fotkami ve sloupci
 
         const randomShift = Math.floor(Math.random() * 101);
         colDiv.style.marginTop = randomShift + 'px';
@@ -371,7 +366,6 @@
       }, 2500);
     }
 
-    // Spustíme galerii, až bude načtený fotky.js
     window.addEventListener('load', createGallery);
   </script>
 
