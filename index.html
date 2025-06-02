@@ -19,6 +19,8 @@
       font-family: Courier, sans-serif;
       color: #eee;
       display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
     #sidebar {
@@ -33,7 +35,7 @@
       top: 0;
       left: 0;
       bottom: 0;
-      z-index: 1001;
+      z-index: 1100; /* vyšší než lightbox */
     }
 
     #sidebar h1 {
@@ -61,6 +63,7 @@
       height: auto;
       user-select: none;
       -webkit-user-drag: none;
+      z-index: 1101; /* nad sidebar textem */
     }
 
     @media (max-height: 500px) {
@@ -76,6 +79,9 @@
       gap: 10px;
       position: absolute;
       bottom: 20px;
+      width: 100%;
+      align-items: center;
+      z-index: 1101;
     }
 
     #sidebar .links a {
@@ -88,13 +94,16 @@
       text-align: center;
       transition: background 0.3s;
       user-select: none;
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     #sidebar .links a:hover {
       background: #555;
     }
 
-    /* Místo #gallery použijeme #gallery-container flex s 4 sloupci */
+    /* Galerie */
     #gallery-container {
       margin-left: 80px;
       padding: 20px;
@@ -106,27 +115,26 @@
       display: flex;
       gap: 15px;
       justify-content: center;
+      box-sizing: border-box;
+      flex-wrap: nowrap;
     }
 
-    /* Každý sloupec je flex sloupec */
     .gallery-column {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 15px;
+      min-width: 0; /* aby se správně škálovalo */
     }
 
-    /* Náhodný vysoký blok nad fotkami */
     .random-block {
       background: #333;
       border-radius: 8px;
       user-select: none;
       -webkit-user-drag: none;
       width: 100%;
-      /* výšku nastavíme v JS náhodně */
     }
 
-    /* Fotky */
     .gallery-column img {
       width: 100%;
       height: auto;
@@ -137,6 +145,7 @@
       display: block;
       user-select: none;
       -webkit-user-drag: none;
+      will-change: transform;
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -167,6 +176,32 @@
       }
     }
 
+    /* Lightbox */
+    #lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1050; /* pod sidebar, ale nad galerií */
+      cursor: zoom-out;
+      user-select: none;
+    }
+
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 8px;
+      box-shadow: 0 0 30px rgba(255,255,255,0.6);
+      user-select: none;
+      -webkit-user-drag: none;
+      cursor: default;
+    }
+
     /* ✅ Styl pro zelený toast */
     #copy-toast {
       position: fixed;
@@ -182,12 +217,13 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease, top 0.3s ease;
-      z-index: 2000;
+      z-index: 1200; /* nejvýše */
     }
 
     #copy-toast.show {
       opacity: 1;
       top: 40px;
+      pointer-events: auto;
     }
   </style>
 </head>
@@ -221,7 +257,7 @@
   </div>
 
   <!-- Lightbox -->
-  <div id="lightbox"></div>
+  <div id="lightbox" tabindex="0" role="dialog" aria-modal="true" aria-label="Zvětšená fotografie"></div>
 
   <!-- ✅ Zelený toast -->
   <div id="copy-toast">Zkopírováno do schránky!</div>
@@ -250,6 +286,8 @@
       document.getElementById('col-3'),
     ];
 
+    const lightbox = document.getElementById('lightbox');
+
     function disableImageInteractions(img) {
       img.addEventListener('contextmenu', e => e.preventDefault());
       img.addEventListener('dragstart', e => e.preventDefault());
@@ -262,10 +300,9 @@
       e.preventDefault();
     }
 
-    // Shuffle fotky
     shuffle(fotky);
 
-    // Nad každý sloupec vložíme náhodný blok s výškou mezi 100 a 300 px
+    // Přidej náhodný blok nad každý sloupec
     galleryColumns.forEach(col => {
       const block = document.createElement('div');
       block.className = 'random-block';
@@ -273,7 +310,7 @@
       col.appendChild(block);
     });
 
-    // Rozdělíme fotky rovnoměrně do 4 sloupců pod blok
+    // Rozděl fotky rovnoměrně do sloupců
     fotky.forEach((src, index) => {
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
@@ -283,6 +320,7 @@
       disableImageInteractions(img);
 
       img.addEventListener('click', () => {
+        // Vyčistit lightbox, vložit zvětšený obrázek a zobrazit
         lightbox.innerHTML = '';
         const enlargedImg = document.createElement('img');
         enlargedImg.src = 'fotos/' + src;
@@ -293,13 +331,14 @@
         lightbox.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         document.addEventListener('touchmove', disableScroll, { passive: false });
+        lightbox.focus();
       });
 
-      // Přidáme do sloupce podle indexu
       const colIndex = index % 4;
       galleryColumns[colIndex].appendChild(img);
     });
 
+    // Zavření lightboxu na klik
     lightbox.addEventListener('click', () => {
       lightbox.style.display = 'none';
       lightbox.innerHTML = '';
@@ -307,6 +346,7 @@
       document.removeEventListener('touchmove', disableScroll);
     });
 
+    // Zavření lightboxu ESC
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && lightbox.style.display === 'flex') {
         lightbox.style.display = 'none';
@@ -318,13 +358,15 @@
 
     function copyAndOpen(event, element) {
       event.preventDefault();
-      const urlToCopy = element.getAttribute('data-copy');
-      navigator.clipboard.writeText(urlToCopy).then(() => {
-        showCopyToast(`Zkopírováno: ${urlToCopy}`);
-        window.open(element.href, '_blank');
-      }).catch(err => {
-        console.error('Chyba při kopírování:', err);
-        window.open(element.href, '_blank');
+      const copyText = element.getAttribute('data-copy');
+      if (!copyText) return;
+
+      navigator.clipboard.writeText(copyText).then(() => {
+        showCopyToast(`Zkopírováno: ${copyText}`);
+        const href = element.href;
+        if (href && href !== '#') {
+          window.open(href, '_blank', 'noopener');
+        }
       });
     }
 
