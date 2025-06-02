@@ -3,177 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Jakub Večeřa - Galerie bez ořezu</title>
+  <title>Galerie</title>
   <style>
-    body {
+    /* Resetování základních stylů */
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
       background-color: #121212;
-      background-image: repeating-linear-gradient(
-        45deg,
-        #1a1a1a 0px,
-        #1a1a1a 1px,
-        #121212 1px,
-        #121212 12px
-      );
-      font-family: Courier, sans-serif;
       color: #eee;
-      display: flex;
-      justify-content: center;
       padding: 20px;
     }
 
-    #gallery {
+    /* Kontejner pro galerii */
+    .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 12px;
-      max-width: 1200px;
-      width: 100%;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
     }
 
-    .photo-wrapper {
-      overflow: visible;
-      /* Základní rámeček pro obrázek */
+    /* Styl pro jednotlivé obrázky */
+    .gallery img {
+      width: 100%;
+      height: auto;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.7);
-      background: #222;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+      object-fit: contain;
       cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 6px; /* malý odstup kolem fotky */
-      transition: transform 0.3s, box-shadow 0.3s;
+      transition: transform 0.3s;
     }
 
-    .photo-wrapper:hover {
+    .gallery img:hover {
       transform: scale(1.05);
-      box-shadow: 0 4px 16px rgba(255,255,255,0.8);
     }
 
-    .photo-wrapper img {
-      width: 100%;
-      height: auto; /* zachová poměr stran */
-      display: block;
-      border-radius: 6px;
-      user-select: none;
-      -webkit-user-drag: none;
-    }
-
-    /* Některé obrázky zabírají 2 sloupce */
-    .photo-wrapper.large {
-      grid-column: span 2;
-    }
-
-    /* Lightbox */
+    /* Styl pro lightbox */
     #lightbox {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.8);
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
       display: none;
       justify-content: center;
       align-items: center;
-      z-index: 1100;
-      cursor: pointer;
-      user-select: none;
-      -webkit-user-drag: none;
+      z-index: 1000;
     }
 
     #lightbox img {
-      max-width: 90vw;
-      max-height: 90vh;
+      max-width: 90%;
+      max-height: 90%;
       border-radius: 10px;
-      box-shadow: 0 0 30px rgba(255,255,255,0.8);
-      user-select: none;
-      -webkit-user-drag: none;
     }
   </style>
 </head>
 <body>
 
-  <div id="gallery"></div>
+  <div class="gallery">
+    <img src="foto1.jpg" alt="Fotografie 1" />
+    <img src="foto2.jpg" alt="Fotografie 2" />
+    <img src="foto3.jpg" alt="Fotografie 3" />
+    <!-- Další obrázky -->
+  </div>
 
-  <div id="lightbox"></div>
+  <div id="lightbox">
+    <img src="" alt="Zvětšený obrázek" />
+  </div>
 
   <script>
-    // Tvoje fotky, nahraď názvy dle potřeby
-    const fotky = [
-      "foto1.jpg",
-      "foto2.jpg",
-      "foto3.jpg",
-      "foto4.jpg",
-      "foto5.jpg",
-      "foto6.jpg",
-      "foto7.jpg",
-      "foto8.jpg",
-      "foto9.jpg",
-      "foto10.jpg"
-    ];
-
-    function shuffle(array) {
-      for (let i = array.length -1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i+1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-
-    const gallery = document.getElementById('gallery');
+    const galleryImages = document.querySelectorAll('.gallery img');
     const lightbox = document.getElementById('lightbox');
+    const lightboxImage = lightbox.querySelector('img');
 
-    function disableImageInteractions(img) {
-      img.addEventListener('contextmenu', e => e.preventDefault());
-      img.addEventListener('dragstart', e => e.preventDefault());
-      img.addEventListener('selectstart', e => e.preventDefault());
-      img.style.userSelect = "none";
-      img.style.webkitUserDrag = "none";
-    }
-
-    shuffle(fotky).forEach(src => {
-      const wrapper = document.createElement('div');
-      wrapper.classList.add('photo-wrapper');
-
-      // Náhodně ~20 % velkých fotek (span 2 sloupce)
-      if (Math.random() < 0.2) {
-        wrapper.classList.add('large');
-      }
-
-      const img = document.createElement('img');
-      img.src = 'fotos/' + src;
-      img.alt = src;
-      img.draggable = false;
-      disableImageInteractions(img);
-
-      wrapper.appendChild(img);
-
-      // Klik pro lightbox
-      wrapper.addEventListener('click', () => {
-        lightbox.innerHTML = '';
-        const enlarged = document.createElement('img');
-        enlarged.src = img.src;
-        enlarged.alt = img.alt;
-        enlarged.draggable = false;
-        disableImageInteractions(enlarged);
-        lightbox.appendChild(enlarged);
+    galleryImages.forEach(img => {
+      img.addEventListener('click', () => {
+        lightboxImage.src = img.src;
         lightbox.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
       });
-
-      gallery.appendChild(wrapper);
     });
 
     lightbox.addEventListener('click', () => {
       lightbox.style.display = 'none';
-      lightbox.innerHTML = '';
-      document.body.style.overflow = '';
-    });
-
-    // ESC zavře lightbox
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && lightbox.style.display === 'flex') {
-        lightbox.style.display = 'none';
-        lightbox.innerHTML = '';
-        document.body.style.overflow = '';
-      }
     });
   </script>
 
