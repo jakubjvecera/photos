@@ -20,9 +20,14 @@
       color: #eee;
       display: flex;
     }
+
     .blur {
       filter: blur(8px);
       transition: filter 0.3s ease;
+    }
+
+    .no-click {
+      pointer-events: none;
     }
 
     #sidebar {
@@ -125,7 +130,6 @@
       -webkit-user-drag: none;
     }
 
-    /* Hover efekt pouze na zařízeních s podporou hover (desktop) */
     @media (hover: hover) and (pointer: fine) {
       #gallery img:hover {
         transform: scale(1.05);
@@ -133,7 +137,6 @@
       }
     }
 
-    /* Lightbox styling + animace */
     #lightbox {
       position: fixed;
       top: 0;
@@ -141,32 +144,12 @@
       width: 100vw;
       height: 100vh;
       background: rgba(0, 0, 0, 0.6);
-      opacity: 0;
-      pointer-events: none;
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
       z-index: 1100;
       cursor: pointer;
       user-select: none;
-      -webkit-user-drag: none;
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-      transition: opacity 0.3s ease;
-    }
-
-    #lightbox.show {
-      opacity: 1;
-      pointer-events: auto;
-      animation: fadeIn 0.3s forwards;
-      display: flex;
-    }
-
-    #lightbox.hide {
-      animation: fadeOut 0.3s forwards;
     }
 
     #lightbox img {
@@ -174,18 +157,6 @@
       max-height: 90vh;
       border-radius: 10px;
       box-shadow: 0 0 30px rgba(255,255,255,0.8);
-      user-select: none;
-      -webkit-user-drag: none;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
     }
 
     @media (max-width: 900px) {
@@ -206,7 +177,6 @@
       }
     }
 
-    /* ✅ Styl pro zelený toast */
     #copy-toast {
       position: fixed;
       top: 20px;
@@ -232,54 +202,32 @@
 </head>
 <body>
 
-  <!-- Sidebar -->
   <div id="sidebar">
     <h1>Jakub Večeřa</h1>
     <img src="logo.png" alt="Logo" id="logo" />
     <div class="links">
-      <a href="mailto:jakub.j.vecera@gmail.com"
-         data-copy="jakub.j.vecera@gmail.com"
-         onclick="copyAndOpen(event, this)">Email</a>
-      <a href="https://instagram.com/jakubjvecera"
-         data-copy="@jakubjvecera"
-         target="_blank"
-         onclick="copyAndOpen(event, this)">Instagram</a>
-      <a href="https://zonerama.com/jakubjvecera/"
-         data-copy="jakubjvecera.zonerama.com"
-         target="_blank"
-         onclick="copyAndOpen(event, this)">Zonerama</a>
+      <a href="mailto:jakub.j.vecera@gmail.com" data-copy="jakub.j.vecera@gmail.com" onclick="copyAndOpen(event, this)">Email</a>
+      <a href="https://instagram.com/jakubjvecera" data-copy="@jakubjvecera" target="_blank" onclick="copyAndOpen(event, this)">Instagram</a>
+      <a href="https://zonerama.com/jakubjvecera/" data-copy="jakubjvecera.zonerama.com" target="_blank" onclick="copyAndOpen(event, this)">Zonerama</a>
     </div>
   </div>
 
-  <!-- Galerie -->
   <div id="gallery-container">
     <div id="gallery"></div>
   </div>
 
-  <!-- Lightbox -->
   <div id="lightbox"></div>
 
-  <!-- ✅ Zelený toast -->
   <div id="copy-toast">Zkopírováno do schránky!</div>
 
-  <!-- ✅ Info pro bez JS -->
   <noscript>
     <div style="padding: 20px; color: white; background-color: #222; text-align: center;">
       ⚠️ Tato stránka vyžaduje JavaScript pro správné zobrazení galerie. Povolte JavaScript ve svém prohlížeči.
     </div>
   </noscript>
 
+  <script src="fotky.js"></script>
   <script>
-    // Příklad pole fotek — nahraď svými daty nebo načti z fotky.js
-    const fotky = [
-      "photo1.jpg",
-      "photo2.jpg",
-      "photo3.jpg",
-      "photo4.jpg",
-      "photo5.jpg",
-      "photo6.jpg"
-    ];
-
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -303,7 +251,6 @@
       e.preventDefault();
     }
 
-    // Naplnění galerie obrázky a eventy pro lightbox
     shuffle(fotky).forEach(src => {
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
@@ -320,13 +267,10 @@
         enlargedImg.draggable = false;
         disableImageInteractions(enlargedImg);
         lightbox.appendChild(enlargedImg);
+        lightbox.style.display = 'flex';
 
-        // Show lightbox s animací
-        lightbox.classList.remove('hide');
-        lightbox.classList.add('show');
-
-        document.getElementById('gallery-container').classList.add('blur');
-        document.getElementById('sidebar').classList.add('blur');
+        document.getElementById('gallery-container').classList.add('blur', 'no-click');
+        document.getElementById('sidebar').classList.add('blur', 'no-click');
 
         const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
         document.body.style.paddingRight = scrollBarWidth + 'px';
@@ -338,26 +282,25 @@
       gallery.appendChild(img);
     });
 
-    function closeLightbox() {
-      lightbox.classList.remove('show');
-      lightbox.classList.add('hide');
+    lightbox.addEventListener('click', () => {
+      lightbox.style.display = 'none';
+      lightbox.innerHTML = '';
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+      document.removeEventListener('touchmove', disableScroll);
+      document.getElementById('gallery-container').classList.remove('blur', 'no-click');
+      document.getElementById('sidebar').classList.remove('blur', 'no-click');
+    });
 
-      setTimeout(() => {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.style.display === 'flex') {
         lightbox.style.display = 'none';
         lightbox.innerHTML = '';
         document.body.style.overflow = '';
         document.body.style.paddingRight = '';
         document.removeEventListener('touchmove', disableScroll);
-        document.getElementById('gallery-container').classList.remove('blur');
-        document.getElementById('sidebar').classList.remove('blur');
-      }, 300);
-    }
-
-    lightbox.addEventListener('click', closeLightbox);
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && lightbox.classList.contains('show')) {
-        closeLightbox();
+        document.getElementById('gallery-container').classList.remove('blur', 'no-click');
+        document.getElementById('sidebar').classList.remove('blur', 'no-click');
       }
     });
 
@@ -382,6 +325,5 @@
       }, 2500);
     }
   </script>
-
 </body>
 </html>
