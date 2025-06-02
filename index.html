@@ -158,7 +158,6 @@
       }
     }
 
-    /* ✅ Styl pro zelený toast */
     #copy-toast {
       position: fixed;
       top: 20px;
@@ -184,10 +183,9 @@
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <div id="sidebar">
+  <div id="sidebar" role="navigation">
     <h1>Jakub Večeřa</h1>
-    <img src="logo.png" alt="Logo" id="logo" />
+    <img src="logo.png" alt="Logo" id="logo" role="img" />
     <div class="links">
       <a href="mailto:jakub.j.vecera@gmail.com"
          data-copy="jakub.j.vecera@gmail.com"
@@ -203,18 +201,13 @@
     </div>
   </div>
 
-  <!-- Galerie -->
   <div id="gallery-container">
     <div id="gallery"></div>
   </div>
 
-  <!-- Lightbox -->
   <div id="lightbox"></div>
-
-  <!-- ✅ Zelený toast -->
   <div id="copy-toast">Zkopírováno do schránky!</div>
 
-  <!-- ✅ Info pro bez JS -->
   <noscript>
     <div style="padding: 20px; color: white; background-color: #222; text-align: center;">
       ⚠️ Tato stránka vyžaduje JavaScript pro správné zobrazení galerie. Povolte JavaScript ve svém prohlížeči.
@@ -237,11 +230,16 @@
     shuffle(fotky).forEach(src => {
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
-      img.alt = src;
-      img.loading = "lazy"; // ✅ lazy loading
+      img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
+      img.loading = "lazy";
+      img.onerror = () => {
+        img.src = 'placeholder.jpg';
+        img.alt = 'Obrázek nelze načíst';
+      };
       img.addEventListener('click', () => {
-        lightbox.innerHTML = `<img src="fotos/${src}" alt="${src}">`;
+        lightbox.innerHTML = `<img src="fotos/${src}" alt="Zvětšená fotografie">`;
         lightbox.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
       });
       gallery.appendChild(img);
     });
@@ -249,14 +247,16 @@
     lightbox.addEventListener('click', () => {
       lightbox.style.display = 'none';
       lightbox.innerHTML = '';
+      document.body.style.overflow = '';
     });
-    // Zavření lightboxu pomocí klávesy Escape
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && lightbox.style.display === 'flex') {
-    lightbox.style.display = 'none';
-    lightbox.innerHTML = '';
-  }
-});
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.style.display === 'flex') {
+        lightbox.style.display = 'none';
+        lightbox.innerHTML = '';
+        document.body.style.overflow = '';
+      }
+    });
 
     function copyAndOpen(event, element) {
       event.preventDefault();
