@@ -151,6 +151,34 @@
       cursor: pointer;
       user-select: none;
     }
+    /* Fade in animace */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Fade out animace */
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+#lightbox {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#lightbox.show {
+  opacity: 1;
+  pointer-events: auto;
+  animation: fadeIn 0.3s forwards;
+}
+
+#lightbox.hide {
+  animation: fadeOut 0.3s forwards;
+}
+
 
     #lightbox img {
       max-width: 90vw;
@@ -259,50 +287,58 @@
       img.draggable = false;
       disableImageInteractions(img);
 
-      img.addEventListener('click', () => {
-        lightbox.innerHTML = '';
-        const enlargedImg = document.createElement('img');
-        enlargedImg.src = 'fotos/' + src;
-        enlargedImg.alt = 'Zvětšená fotografie';
-        enlargedImg.draggable = false;
-        disableImageInteractions(enlargedImg);
-        lightbox.appendChild(enlargedImg);
-        lightbox.style.display = 'flex';
+    // Otevření lightboxu (v eventu click na obrázek)
+img.addEventListener('click', () => {
+  lightbox.innerHTML = '';
+  const enlargedImg = document.createElement('img');
+  enlargedImg.src = 'fotos/' + src;
+  enlargedImg.alt = 'Zvětšená fotografie';
+  enlargedImg.draggable = false;
+  disableImageInteractions(enlargedImg);
+  lightbox.appendChild(enlargedImg);
+  
+  // Přidáme třídu show a odstraníme hide
+  lightbox.classList.remove('hide');
+  lightbox.classList.add('show');
+  
+  document.getElementById('gallery-container').classList.add('blur');
+  document.getElementById('sidebar').classList.add('blur');
 
-        document.getElementById('gallery-container').classList.add('blur', 'no-click');
-        document.getElementById('sidebar').classList.add('blur', 'no-click');
+  const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.paddingRight = scrollBarWidth + 'px';
+  document.body.style.overflow = 'hidden';
 
-        const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-        document.body.style.paddingRight = scrollBarWidth + 'px';
-        document.body.style.overflow = 'hidden';
+  document.addEventListener('touchmove', disableScroll, { passive: false });
+});
 
-        document.addEventListener('touchmove', disableScroll, { passive: false });
-      });
 
       gallery.appendChild(img);
     });
 
-    lightbox.addEventListener('click', () => {
-      lightbox.style.display = 'none';
-      lightbox.innerHTML = '';
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-      document.removeEventListener('touchmove', disableScroll);
-      document.getElementById('gallery-container').classList.remove('blur', 'no-click');
-      document.getElementById('sidebar').classList.remove('blur', 'no-click');
-    });
+  function closeLightbox() {
+  lightbox.classList.remove('show');
+  lightbox.classList.add('hide');
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && lightbox.style.display === 'flex') {
-        lightbox.style.display = 'none';
-        lightbox.innerHTML = '';
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
-        document.removeEventListener('touchmove', disableScroll);
-        document.getElementById('gallery-container').classList.remove('blur', 'no-click');
-        document.getElementById('sidebar').classList.remove('blur', 'no-click');
-      }
-    });
+  // Po animaci fadeOut schováme lightbox a vyčistíme obsah
+  setTimeout(() => {
+    lightbox.style.display = 'none';
+    lightbox.innerHTML = '';
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+    document.removeEventListener('touchmove', disableScroll);
+    document.getElementById('gallery-container').classList.remove('blur');
+    document.getElementById('sidebar').classList.remove('blur');
+  }, 300); // délka animace v ms
+}
+
+lightbox.addEventListener('click', closeLightbox);
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && lightbox.classList.contains('show')) {
+    closeLightbox();
+  }
+});
+
 
     function copyAndOpen(event, element) {
       event.preventDefault();
