@@ -199,6 +199,10 @@
       opacity: 1;
       top: 40px;
     }
+    #gallery > div {
+  break-inside: avoid;
+}
+
   </style>
 </head>
 <body>
@@ -266,7 +270,20 @@
     }
 
     shuffle(fotky).forEach(src => {
-      const img = document.createElement('img');
+     const wrapper = document.createElement('div');
+const img = document.createElement('img');
+img.src = 'fotos/' + src;
+img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
+img.loading = "lazy";
+img.draggable = false;
+disableImageInteractions(img);
+
+// 🎯 náhodný posun mezi 0–100 px
+wrapper.style.marginTop = Math.floor(Math.random() * 100) + 'px';
+
+wrapper.appendChild(img);
+gallery.appendChild(wrapper);
+
       img.src = 'fotos/' + src;
       img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
       img.loading = "lazy";
