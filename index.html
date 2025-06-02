@@ -3,14 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="icon.png" type="image/png" />
   <title>Jakub Večeřa</title>
   <style>
     body {
       margin: 0;
+      padding-left: 80px; /* Sidebar offset */
       background-color: #121212;
+      background-image: repeating-linear-gradient(
+        45deg,
+        #1a1a1a 0px,
+        #1a1a1a 1px,
+        #121212 1px,
+        #121212 12px
+      );
       font-family: Courier, sans-serif;
       color: #eee;
-      display: flex;
     }
 
     #sidebar {
@@ -39,6 +47,12 @@
       user-select: none;
     }
 
+    @media (max-height: 500px) {
+      #sidebar h1 {
+        display: none;
+      }
+    }
+
     #logo {
       position: fixed;
       top: 320px;
@@ -47,6 +61,13 @@
       height: auto;
       user-select: none;
       -webkit-user-drag: none;
+    }
+
+    @media (max-height: 500px) {
+      #logo {
+        top: 40px;
+        left: 20px;
+      }
     }
 
     #sidebar .links {
@@ -74,51 +95,37 @@
     }
 
     #gallery-container {
-      margin-left: 80px;
       padding: 20px;
-      flex-grow: 1;
+      width: 100%;
+      overflow-y: auto;
+      max-width: 1200px;
+      margin-right: auto;
+      margin-left: auto;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
     }
 
-    #gallery {
-      column-count: 1;
-      column-gap: 15px;
-    }
-
-    @media (min-width: 500px) {
-      #gallery {
-        column-count: 2;
-      }
-    }
-
-    @media (min-width: 800px) {
-      #gallery {
-        column-count: 3;
-      }
-    }
-
-    @media (min-width: 1100px) {
-      #gallery {
-        column-count: 4;
-      }
-    }
-
-    .photo-wrapper {
-      break-inside: avoid;
-      margin-bottom: 15px;
+    .gallery-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
 
     .random-block {
-      background: #1a1a1a;
+      background: #333;
       border-radius: 8px;
+      user-select: none;
+      -webkit-user-drag: none;
       width: 100%;
-      margin-bottom: 10px;
     }
 
-    .photo-wrapper img {
+    .gallery-column img {
       width: 100%;
       height: auto;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.7);
       cursor: pointer;
       transition: transform 0.3s;
       display: block;
@@ -127,31 +134,47 @@
     }
 
     @media (hover: hover) and (pointer: fine) {
-      .photo-wrapper img:hover {
+      .gallery-column img:hover {
         transform: scale(1.05);
-        box-shadow: 0 4px 16px rgba(255, 255, 255, 0.8);
+        box-shadow: 0 4px 16px rgba(255,255,255,0.8);
       }
     }
 
-    #lightbox {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1100;
-      cursor: pointer;
+    @media (max-width: 800px) {
+      #gallery-container {
+        flex-wrap: wrap;
+      }
+      .gallery-column {
+        flex: 0 0 48%;
+      }
     }
 
-    #lightbox img {
-      max-width: 90vw;
-      max-height: 90vh;
-      border-radius: 10px;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+    @media (max-width: 600px) {
+      .gallery-column {
+        flex: 0 0 100%;
+      }
+    }
+
+    #copy-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #28a745;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, top 0.3s ease;
+      z-index: 2000;
+    }
+
+    #copy-toast.show {
+      opacity: 1;
+      top: 40px;
     }
   </style>
 </head>
@@ -160,60 +183,125 @@
     <h1>Jakub Večeřa</h1>
     <img src="logo.png" alt="Logo" id="logo" />
     <div class="links">
-      <a href="mailto:jakub.j.vecera@gmail.com">Email</a>
-      <a href="https://instagram.com/jakubjvecera" target="_blank">Instagram</a>
-      <a href="https://zonerama.com/jakubjvecera/" target="_blank">Zonerama</a>
+      <a href="mailto:jakub.j.vecera@gmail.com" data-copy="jakub.j.vecera@gmail.com" onclick="copyAndOpen(event, this)">Email</a>
+      <a href="https://instagram.com/jakubjvecera" data-copy="@jakubjvecera" target="_blank" onclick="copyAndOpen(event, this)">Instagram</a>
+      <a href="https://zonerama.com/jakubjvecera/" data-copy="jakubjvecera.zonerama.com" target="_blank" onclick="copyAndOpen(event, this)">Zonerama</a>
     </div>
   </div>
 
   <div id="gallery-container">
-    <div id="gallery"></div>
+    <div class="gallery-column" id="col-0"></div>
+    <div class="gallery-column" id="col-1"></div>
+    <div class="gallery-column" id="col-2"></div>
+    <div class="gallery-column" id="col-3"></div>
   </div>
 
   <div id="lightbox"></div>
+  <div id="copy-toast">Zkopírováno do schránky!</div>
 
+  <noscript>
+    <div style="padding: 20px; color: white; background-color: #222; text-align: center;">
+      ⚠️ Tato stránka vyžaduje JavaScript pro správné zobrazení galerie. Povolte JavaScript ve svém prohlížeči.
+    </div>
+  </noscript>
+
+  <script src="fotky.js"></script>
   <script>
-    const gallery = document.getElementById('gallery');
-    const lightbox = document.getElementById('lightbox');
-
-    // Ukázkový seznam fotek
-    const fotky = ["01.jpg", "02.jpg", "03.jpg", "04.jpg", "05.jpg", "06.jpg", "07.jpg", "08.jpg"];
-
-    // Rozmíchej pole fotek
-    fotky.sort(() => Math.random() - 0.5);
-
-    // Vlož náhodné bloky a fotky
-    fotky.forEach((src, i) => {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'photo-wrapper';
-
-      if (i % 4 === 0) {
-        const block = document.createElement('div');
-        block.className = 'random-block';
-        block.style.height = `${Math.floor(Math.random() * 200 + 100)}px`;
-        wrapper.appendChild(block);
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
       }
+      return array;
+    }
 
+    const galleryColumns = [
+      document.getElementById('col-0'),
+      document.getElementById('col-1'),
+      document.getElementById('col-2'),
+      document.getElementById('col-3')
+    ];
+
+    function disableImageInteractions(img) {
+      img.addEventListener('contextmenu', e => e.preventDefault());
+      img.addEventListener('dragstart', e => e.preventDefault());
+      img.addEventListener('selectstart', e => e.preventDefault());
+      img.style.userSelect = "none";
+      img.style.webkitUserDrag = "none";
+    }
+
+    function disableScroll(e) {
+      e.preventDefault();
+    }
+
+    shuffle(fotky);
+
+    galleryColumns.forEach(col => {
+      const block = document.createElement('div');
+      block.className = 'random-block';
+      block.style.height = (100 + Math.floor(Math.random() * 200)) + 'px';
+      col.appendChild(block);
+    });
+
+    fotky.forEach((src, index) => {
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
-      img.alt = src;
-      img.loading = 'lazy';
+      img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
+      img.loading = "lazy";
+      img.draggable = false;
+      disableImageInteractions(img);
 
       img.addEventListener('click', () => {
         lightbox.innerHTML = '';
-        const bigImg = document.createElement('img');
-        bigImg.src = img.src;
-        lightbox.appendChild(bigImg);
+        const enlargedImg = document.createElement('img');
+        enlargedImg.src = 'fotos/' + src;
+        enlargedImg.alt = 'Zvětšená fotografie';
+        enlargedImg.draggable = false;
+        disableImageInteractions(enlargedImg);
+        lightbox.appendChild(enlargedImg);
         lightbox.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        document.addEventListener('touchmove', disableScroll, { passive: false });
       });
 
-      wrapper.appendChild(img);
-      gallery.appendChild(wrapper);
+      const colIndex = index % 4;
+      galleryColumns[colIndex].appendChild(img);
     });
 
     lightbox.addEventListener('click', () => {
       lightbox.style.display = 'none';
+      lightbox.innerHTML = '';
+      document.body.style.overflow = '';
+      document.removeEventListener('touchmove', disableScroll);
     });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.style.display === 'flex') {
+        lightbox.style.display = 'none';
+        lightbox.innerHTML = '';
+        document.body.style.overflow = '';
+        document.removeEventListener('touchmove', disableScroll);
+      }
+    });
+
+    function copyAndOpen(event, element) {
+      event.preventDefault();
+      const urlToCopy = element.getAttribute('data-copy');
+      navigator.clipboard.writeText(urlToCopy).then(() => {
+        showCopyToast(`Zkopírováno: ${urlToCopy}`);
+        window.open(element.href, '_blank');
+      }).catch(err => {
+        console.error('Chyba při kopírování:', err);
+        window.open(element.href, '_blank');
+      });
+    }
+
+    function showCopyToast(message) {
+      const toast = document.getElementById('copy-toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
   </script>
 </body>
 </html>
