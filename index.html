@@ -273,36 +273,43 @@
       img.draggable = false;
       disableImageInteractions(img);
 
-      img.addEventListener('click', () => {
-        lightbox.innerHTML = '';
-        const enlargedImg = document.createElement('img');
-        enlargedImg.src = 'fotos/' + src;
-        enlargedImg.alt = 'Zvětšená fotografie';
-        enlargedImg.draggable = false;
-        disableImageInteractions(enlargedImg);
-        lightbox.appendChild(enlargedImg);
-        lightbox.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        document.addEventListener('touchmove', disableScroll, { passive: false });
-      });
+img.addEventListener('click', () => {
+  lightbox.innerHTML = '';
+  const enlargedImg = document.createElement('img');
+  enlargedImg.src = 'fotos/' + src;
+  enlargedImg.alt = 'Zvětšená fotografie';
+  enlargedImg.draggable = false;
+  disableImageInteractions(enlargedImg);
+  lightbox.appendChild(enlargedImg);
+  lightbox.style.display = 'flex';
+
+  const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.paddingRight = scrollBarWidth + 'px';
+  document.body.style.overflow = 'hidden';
+
+  document.addEventListener('touchmove', disableScroll, { passive: false });
+});
 
       gallery.appendChild(img);
     });
 
     lightbox.addEventListener('click', () => {
-      lightbox.style.display = 'none';
-      lightbox.innerHTML = '';
-      document.body.style.overflow = '';
-      document.removeEventListener('touchmove', disableScroll);
-    });
+  lightbox.style.display = 'none';
+  lightbox.innerHTML = '';
+  document.body.style.overflow = '';
+  document.body.style.paddingRight = '';
+  document.removeEventListener('touchmove', disableScroll);
+});
+
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && lightbox.style.display === 'flex') {
-        lightbox.style.display = 'none';
-        lightbox.innerHTML = '';
-        document.body.style.overflow = '';
-        document.removeEventListener('touchmove', disableScroll);
-      }
+if (e.key === 'Escape' && lightbox.style.display === 'flex') {
+  lightbox.style.display = 'none';
+  lightbox.innerHTML = '';
+  document.body.style.overflow = '';
+  document.body.style.paddingRight = '';
+  document.removeEventListener('touchmove', disableScroll);
+}
     });
 
     function copyAndOpen(event, element) {
