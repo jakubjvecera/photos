@@ -48,7 +48,7 @@
     }
 
     @media (max-height: 500px) {
-      #sidebar h1 {
+      #sidebar h1, #logo {
         display: none;
       }
     }
@@ -101,17 +101,24 @@
       overflow-y: auto;
     }
 
+    /* Grid místo column-count */
     #gallery {
-      column-count: 4;
-      column-gap: 15px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
       max-width: 1200px;
       margin: 0 auto;
+    }
+
+    #gallery .column {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
 
     #gallery img {
       width: 100%;
       height: auto;
-      margin-bottom: 15px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.7);
       cursor: pointer;
@@ -159,24 +166,6 @@
       -webkit-user-drag: none;
     }
 
-    @media (max-width: 900px) {
-      #gallery {
-        column-count: 3;
-      }
-    }
-
-    @media (max-width: 600px) {
-      #gallery {
-        column-count: 2;
-      }
-    }
-
-    @media (max-width: 400px) {
-      #gallery {
-        column-count: 1;
-      }
-    }
-
     /* ✅ Styl pro zelený toast */
     #copy-toast {
       position: fixed;
@@ -199,9 +188,6 @@
       opacity: 1;
       top: 40px;
     }
-    #gallery > div {
-  break-inside: avoid;
-}
 
   </style>
 </head>
@@ -244,8 +230,21 @@
     </div>
   </noscript>
 
-  <script src="fotky.js"></script>
   <script>
+    // Příklad seznamu fotek - uprav si dle potřeby
+    const fotky = [
+      'photo1.jpg',
+      'photo2.jpg',
+      'photo3.jpg',
+      'photo4.jpg',
+      'photo5.jpg',
+      'photo6.jpg',
+      'photo7.jpg',
+      'photo8.jpg',
+      'photo9.jpg',
+      'photo10.jpg'
+    ];
+
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -256,6 +255,14 @@
 
     const gallery = document.getElementById('gallery');
     const lightbox = document.getElementById('lightbox');
+
+    // Nastaví počet sloupců podle šířky okna
+    function getColumnsCount() {
+      if (window.innerWidth < 400) return 1;
+      if (window.innerWidth < 600) return 2;
+      if (window.innerWidth < 900) return 3;
+      return 4;
+    }
 
     function disableImageInteractions(img) {
       img.addEventListener('contextmenu', e => e.preventDefault());
@@ -269,42 +276,49 @@
       e.preventDefault();
     }
 
-    shuffle(fotky).forEach(src => {
-     const wrapper = document.createElement('div');
-const img = document.createElement('img');
-img.src = 'fotos/' + src;
-img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
-img.loading = "lazy";
-img.draggable = false;
-disableImageInteractions(img);
+    function renderGallery() {
+      gallery.innerHTML = '';
 
-// 🎯 náhodný posun mezi 0–100 px
-wrapper.style.marginTop = Math.floor(Math.random() * 100) + 'px';
+      const columnsCount = getColumnsCount();
+      const columns = [];
 
-wrapper.appendChild(img);
-gallery.appendChild(wrapper);
+      // Vytvoření sloupců s náhodným padding-top
+      for (let i = 0; i < columnsCount; i++) {
+        const col = document.createElement('div');
+        col.classList.add('column');
+        col.style.paddingTop = Math.floor(Math.random() * 100) + 'px';
+        gallery.appendChild(col);
+        columns.push(col);
+      }
 
-      img.src = 'fotos/' + src;
-      img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
-      img.loading = "lazy";
-      img.draggable = false;
-      disableImageInteractions(img);
+      shuffle(fotky).forEach((src, index) => {
+        const img = document.createElement('img');
+        img.src = 'fotos/' + src;
+        img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
+        img.loading = "lazy";
+        img.draggable = false;
+        disableImageInteractions(img);
 
-      img.addEventListener('click', () => {
-        lightbox.innerHTML = '';
-        const enlargedImg = document.createElement('img');
-        enlargedImg.src = 'fotos/' + src;
-        enlargedImg.alt = 'Zvětšená fotografie';
-        enlargedImg.draggable = false;
-        disableImageInteractions(enlargedImg);
-        lightbox.appendChild(enlargedImg);
-        lightbox.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        document.addEventListener('touchmove', disableScroll, { passive: false });
+        img.addEventListener('click', () => {
+          lightbox.innerHTML = '';
+          const enlargedImg = document.createElement('img');
+          enlargedImg.src = 'fotos/' + src;
+          enlargedImg.alt = 'Zvětšená fotografie';
+          enlargedImg.draggable = false;
+          disableImageInteractions(enlargedImg);
+          lightbox.appendChild(enlargedImg);
+          lightbox.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+          document.addEventListener('touchmove', disableScroll, { passive: false });
+        });
+
+        const colIndex = index % columnsCount;
+        columns[colIndex].appendChild(img);
       });
+    }
 
-      gallery.appendChild(img);
-    });
+    window.addEventListener('resize', renderGallery);
+    window.addEventListener('load', renderGallery);
 
     lightbox.addEventListener('click', () => {
       lightbox.style.display = 'none';
@@ -322,27 +336,30 @@ gallery.appendChild(wrapper);
       }
     });
 
-    function copyAndOpen(event, element) {
+    // Kopírování emailu/insta/zonerama s toastem
+    function copyAndOpen(event, elem) {
       event.preventDefault();
-      const urlToCopy = element.getAttribute('data-copy');
-      navigator.clipboard.writeText(urlToCopy).then(() => {
-        showCopyToast(`Zkopírováno: ${urlToCopy}`);
-        window.open(element.href, '_blank');
-      }).catch(err => {
-        console.error('Chyba při kopírování:', err);
-        window.open(element.href, '_blank');
+      const copyText = elem.dataset.copy;
+      navigator.clipboard.writeText(copyText).then(() => {
+        showToast();
+        if (elem.href.startsWith('mailto:') || elem.target === '_blank') {
+          window.open(elem.href, '_blank');
+        } else {
+          window.location.href = elem.href;
+        }
+      }).catch(() => {
+        // fallback
+        alert('Nelze zkopírovat do schránky.');
       });
     }
 
-    function showCopyToast(message) {
+    function showToast() {
       const toast = document.getElementById('copy-toast');
-      toast.textContent = message;
       toast.classList.add('show');
       setTimeout(() => {
         toast.classList.remove('show');
-      }, 2500);
+      }, 1500);
     }
   </script>
-
 </body>
 </html>
