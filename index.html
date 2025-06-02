@@ -8,7 +8,6 @@
   <style>
     body {
       margin: 0;
-      padding-left: 80px; /* Sidebar offset */
       background-color: #121212;
       background-image: repeating-linear-gradient(
         45deg,
@@ -95,19 +94,20 @@
     }
 
     #gallery-container {
+      margin-left: 80px;
       padding: 20px;
-      width: 100%;
-      overflow-y: auto;
-      max-width: 1200px;
-      margin-right: auto;
-      margin-left: auto;
       display: flex;
+      flex-wrap: wrap;
       gap: 15px;
       justify-content: center;
+      max-width: 1400px;
+      margin-right: auto;
     }
 
     .gallery-column {
       flex: 1;
+      min-width: 220px;
+      max-width: 300px;
       display: flex;
       flex-direction: column;
       gap: 15px;
@@ -116,8 +116,6 @@
     .random-block {
       background: #333;
       border-radius: 8px;
-      user-select: none;
-      -webkit-user-drag: none;
       width: 100%;
     }
 
@@ -125,10 +123,9 @@
       width: 100%;
       height: auto;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
       cursor: pointer;
       transition: transform 0.3s;
-      display: block;
       user-select: none;
       -webkit-user-drag: none;
     }
@@ -136,14 +133,11 @@
     @media (hover: hover) and (pointer: fine) {
       .gallery-column img:hover {
         transform: scale(1.05);
-        box-shadow: 0 4px 16px rgba(255,255,255,0.8);
+        box-shadow: 0 4px 16px rgba(255, 255, 255, 0.8);
       }
     }
 
     @media (max-width: 800px) {
-      #gallery-container {
-        flex-wrap: wrap;
-      }
       .gallery-column {
         flex: 0 0 48%;
       }
@@ -153,6 +147,44 @@
       .gallery-column {
         flex: 0 0 100%;
       }
+
+      #sidebar {
+        position: absolute;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 10px;
+        top: auto;
+        left: 0;
+        bottom: 0;
+      }
+
+      #gallery-container {
+        margin-left: 0;
+        padding-bottom: 80px;
+      }
+    }
+
+    #lightbox {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.95);
+      align-items: center;
+      justify-content: center;
+    }
+
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 8px;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     #copy-toast {
@@ -169,7 +201,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease, top 0.3s ease;
-      z-index: 2000;
+      z-index: 3000;
     }
 
     #copy-toast.show {
@@ -179,129 +211,133 @@
   </style>
 </head>
 <body>
-  <div id="sidebar">
-    <h1>Jakub Večeřa</h1>
-    <img src="logo.png" alt="Logo" id="logo" />
-    <div class="links">
-      <a href="mailto:jakub.j.vecera@gmail.com" data-copy="jakub.j.vecera@gmail.com" onclick="copyAndOpen(event, this)">Email</a>
-      <a href="https://instagram.com/jakubjvecera" data-copy="@jakubjvecera" target="_blank" onclick="copyAndOpen(event, this)">Instagram</a>
-      <a href="https://zonerama.com/jakubjvecera/" data-copy="jakubjvecera.zonerama.com" target="_blank" onclick="copyAndOpen(event, this)">Zonerama</a>
-    </div>
+
+<div id="sidebar">
+  <h1>Jakub Večeřa</h1>
+  <img src="logo.png" alt="Logo" id="logo" />
+  <div class="links">
+    <a href="mailto:jakub.j.vecera@gmail.com" data-copy="jakub.j.vecera@gmail.com" onclick="copyAndOpen(event, this)">Email</a>
+    <a href="https://instagram.com/jakubjvecera" data-copy="@jakubjvecera" target="_blank" onclick="copyAndOpen(event, this)">Instagram</a>
+    <a href="https://zonerama.com/jakubjvecera/" data-copy="jakubjvecera.zonerama.com" target="_blank" onclick="copyAndOpen(event, this)">Zonerama</a>
   </div>
+</div>
 
-  <div id="gallery-container">
-    <div class="gallery-column" id="col-0"></div>
-    <div class="gallery-column" id="col-1"></div>
-    <div class="gallery-column" id="col-2"></div>
-    <div class="gallery-column" id="col-3"></div>
+<div id="gallery-container">
+  <div class="gallery-column" id="col-0"></div>
+  <div class="gallery-column" id="col-1"></div>
+  <div class="gallery-column" id="col-2"></div>
+  <div class="gallery-column" id="col-3"></div>
+</div>
+
+<div id="lightbox"></div>
+<div id="copy-toast">Zkopírováno do schránky!</div>
+
+<noscript>
+  <div style="padding: 20px; color: white; background-color: #222; text-align: center;">
+    ⚠️ Tato stránka vyžaduje JavaScript pro správné zobrazení galerie. Povolte JavaScript ve svém prohlížeči.
   </div>
+</noscript>
 
-  <div id="lightbox"></div>
-  <div id="copy-toast">Zkopírováno do schránky!</div>
+<script>
+  const fotky = [
+    // příklad fotek, v reálu načítáno ze souboru fotky.js
+    "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg", "7.jpg", "8.jpg",
+    "9.jpg", "10.jpg", "11.jpg", "12.jpg"
+  ];
 
-  <noscript>
-    <div style="padding: 20px; color: white; background-color: #222; text-align: center;">
-      ⚠️ Tato stránka vyžaduje JavaScript pro správné zobrazení galerie. Povolte JavaScript ve svém prohlížeči.
-    </div>
-  </noscript>
-
-  <script src="fotky.js"></script>
-  <script>
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
+    return array;
+  }
 
-    const galleryColumns = [
-      document.getElementById('col-0'),
-      document.getElementById('col-1'),
-      document.getElementById('col-2'),
-      document.getElementById('col-3')
-    ];
+  const galleryColumns = [
+    document.getElementById('col-0'),
+    document.getElementById('col-1'),
+    document.getElementById('col-2'),
+    document.getElementById('col-3'),
+  ];
 
-    function disableImageInteractions(img) {
-      img.addEventListener('contextmenu', e => e.preventDefault());
-      img.addEventListener('dragstart', e => e.preventDefault());
-      img.addEventListener('selectstart', e => e.preventDefault());
-      img.style.userSelect = "none";
-      img.style.webkitUserDrag = "none";
-    }
+  function disableImageInteractions(img) {
+    img.addEventListener('contextmenu', e => e.preventDefault());
+    img.addEventListener('dragstart', e => e.preventDefault());
+    img.addEventListener('selectstart', e => e.preventDefault());
+    img.style.userSelect = "none";
+    img.style.webkitUserDrag = "none";
+  }
 
-    function disableScroll(e) {
-      e.preventDefault();
-    }
+  // Shuffle fotky
+  shuffle(fotky);
 
-    shuffle(fotky);
+  // Náhodné bloky
+  galleryColumns.forEach(col => {
+    const block = document.createElement('div');
+    block.className = 'random-block';
+    block.style.height = (100 + Math.floor(Math.random() * 200)) + 'px';
+    col.appendChild(block);
+  });
 
-    galleryColumns.forEach(col => {
-      const block = document.createElement('div');
-      block.className = 'random-block';
-      block.style.height = (100 + Math.floor(Math.random() * 200)) + 'px';
-      col.appendChild(block);
-    });
+  fotky.forEach((src, index) => {
+    const img = document.createElement('img');
+    img.src = 'fotos/' + src;
+    img.alt = 'Fotografie ' + src;
+    img.loading = "lazy";
+    img.draggable = false;
+    disableImageInteractions(img);
 
-    fotky.forEach((src, index) => {
-      const img = document.createElement('img');
-      img.src = 'fotos/' + src;
-      img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
-      img.loading = "lazy";
-      img.draggable = false;
-      disableImageInteractions(img);
-
-      img.addEventListener('click', () => {
-        lightbox.innerHTML = '';
-        const enlargedImg = document.createElement('img');
-        enlargedImg.src = 'fotos/' + src;
-        enlargedImg.alt = 'Zvětšená fotografie';
-        enlargedImg.draggable = false;
-        disableImageInteractions(enlargedImg);
-        lightbox.appendChild(enlargedImg);
-        lightbox.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        document.addEventListener('touchmove', disableScroll, { passive: false });
-      });
-
-      const colIndex = index % 4;
-      galleryColumns[colIndex].appendChild(img);
-    });
-
-    lightbox.addEventListener('click', () => {
-      lightbox.style.display = 'none';
+    img.addEventListener('click', () => {
+      const lightbox = document.getElementById('lightbox');
       lightbox.innerHTML = '';
-      document.body.style.overflow = '';
-      document.removeEventListener('touchmove', disableScroll);
+      const enlargedImg = document.createElement('img');
+      enlargedImg.src = 'fotos/' + src;
+      enlargedImg.alt = 'Zvětšená fotografie';
+      disableImageInteractions(enlargedImg);
+      lightbox.appendChild(enlargedImg);
+      lightbox.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
     });
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && lightbox.style.display === 'flex') {
+    const colIndex = index % 4;
+    galleryColumns[colIndex].appendChild(img);
+  });
+
+  document.getElementById('lightbox').addEventListener('click', () => {
+    const lightbox = document.getElementById('lightbox');
+    lightbox.style.display = 'none';
+    lightbox.innerHTML = '';
+    document.body.style.overflow = '';
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const lightbox = document.getElementById('lightbox');
+      if (lightbox.style.display === 'flex') {
         lightbox.style.display = 'none';
         lightbox.innerHTML = '';
         document.body.style.overflow = '';
-        document.removeEventListener('touchmove', disableScroll);
       }
+    }
+  });
+
+  function copyAndOpen(event, element) {
+    event.preventDefault();
+    const urlToCopy = element.getAttribute('data-copy');
+    navigator.clipboard.writeText(urlToCopy).then(() => {
+      showCopyToast(`Zkopírováno: ${urlToCopy}`);
+      window.open(element.href, '_blank');
+    }).catch(() => {
+      window.open(element.href, '_blank');
     });
+  }
 
-    function copyAndOpen(event, element) {
-      event.preventDefault();
-      const urlToCopy = element.getAttribute('data-copy');
-      navigator.clipboard.writeText(urlToCopy).then(() => {
-        showCopyToast(`Zkopírováno: ${urlToCopy}`);
-        window.open(element.href, '_blank');
-      }).catch(err => {
-        console.error('Chyba při kopírování:', err);
-        window.open(element.href, '_blank');
-      });
-    }
-
-    function showCopyToast(message) {
-      const toast = document.getElementById('copy-toast');
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
-    }
-  </script>
+  function showCopyToast(message) {
+    const toast = document.getElementById('copy-toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+</script>
 </body>
 </html>
