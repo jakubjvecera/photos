@@ -121,6 +121,7 @@
       -webkit-user-drag: none;
     }
 
+    /* Hover efekt pouze na zařízeních s podporou hover (desktop) */
     @media (hover: hover) and (pointer: fine) {
       #gallery img:hover {
         transform: scale(1.05);
@@ -140,6 +141,13 @@
       align-items: center;
       z-index: 1100;
       cursor: pointer;
+      user-select: none;
+      -webkit-user-drag: none;
+      -webkit-touch-callout: none; /* dlouhé podržení */
+      -webkit-user-select: none; /* iOS */
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
 
     #lightbox img {
@@ -169,6 +177,7 @@
       }
     }
 
+    /* ✅ Styl pro zelený toast */
     #copy-toast {
       position: fixed;
       top: 20px;
@@ -194,122 +203,130 @@
 </head>
 <body>
 
+  <!-- Sidebar -->
   <div id="sidebar">
     <h1>Jakub Večeřa</h1>
     <img src="logo.png" alt="Logo" id="logo" />
     <div class="links">
-      <a href="mailto:jakub.j.vecera@gmail.com" data-copy="jakub.j.vecera@gmail.com" onclick="copyAndOpen(event, this)">Email</a>
-      <a href="https://instagram.com/jakubjvecera" data-copy="@jakubjvecera" target="_blank" onclick="copyAndOpen(event, this)">Instagram</a>
-      <a href="https://zonerama.com/jakubjvecera/" data-copy="jakubjvecera.zonerama.com" target="_blank" onclick="copyAndOpen(event, this)">Zonerama</a>
+      <a href="mailto:jakub.j.vecera@gmail.com"
+         data-copy="jakub.j.vecera@gmail.com"
+         onclick="copyAndOpen(event, this)">Email</a>
+      <a href="https://instagram.com/jakubjvecera"
+         data-copy="@jakubjvecera"
+         target="_blank"
+         onclick="copyAndOpen(event, this)">Instagram</a>
+      <a href="https://zonerama.com/jakubjvecera/"
+         data-copy="jakubjvecera.zonerama.com"
+         target="_blank"
+         onclick="copyAndOpen(event, this)">Zonerama</a>
     </div>
   </div>
 
+  <!-- Galerie -->
   <div id="gallery-container">
     <div id="gallery"></div>
   </div>
 
+  <!-- Lightbox -->
   <div id="lightbox"></div>
 
+  <!-- ✅ Zelený toast -->
   <div id="copy-toast">Zkopírováno do schránky!</div>
 
+  <!-- ✅ Info pro bez JS -->
   <noscript>
     <div style="padding: 20px; color: white; background-color: #222; text-align: center;">
       ⚠️ Tato stránka vyžaduje JavaScript pro správné zobrazení galerie. Povolte JavaScript ve svém prohlížeči.
     </div>
   </noscript>
 
-  <script>
-    // Testovací obrázky (nahraď vlastním polem z fotky.js)
-    const fotky = [
-      "01.jpg", "02.jpg", "03.jpg", "04.jpg", "05.jpg"
-    ];
+<script>
+  const gallery = document.getElementById('gallery');
+  const lightbox = document.getElementById('lightbox');
+  const body = document.body;
 
-    function shuffle(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
+  function getScrollbarWidth() {
+    return window.innerWidth - document.documentElement.clientWidth;
+  }
+
+  function disableScroll(e) {
+    e.preventDefault();
+  }
+
+  function disableImageInteractions(img) {
+    img.addEventListener('contextmenu', e => e.preventDefault());
+    img.addEventListener('dragstart', e => e.preventDefault());
+    img.addEventListener('selectstart', e => e.preventDefault());
+    img.style.userSelect = "none";
+    img.style.webkitUserDrag = "none";
+  }
+
+  function openLightbox(src) {
+    lightbox.innerHTML = '';
+    const enlargedImg = document.createElement('img');
+    enlargedImg.src = 'fotos/' + src;
+    enlargedImg.alt = 'Zvětšená fotografie';
+    enlargedImg.draggable = false;
+    disableImageInteractions(enlargedImg);
+    lightbox.appendChild(enlargedImg);
+
+    // ✨ Scroll fix
+    const scrollbarWidth = getScrollbarWidth();
+    body.style.paddingRight = scrollbarWidth + 'px';
+    body.style.overflow = 'hidden';
+
+    lightbox.style.display = 'flex';
+    document.addEventListener('touchmove', disableScroll, { passive: false });
+  }
+
+  function closeLightbox() {
+    lightbox.style.display = 'none';
+    lightbox.innerHTML = '';
+    body.style.overflow = '';
+    body.style.paddingRight = '';
+    document.removeEventListener('touchmove', disableScroll);
+  }
+
+  shuffle(fotky).forEach(src => {
+    const img = document.createElement('img');
+    img.src = 'fotos/' + src;
+    img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
+    img.loading = "lazy";
+    img.draggable = false;
+    disableImageInteractions(img);
+
+    img.addEventListener('click', () => openLightbox(src));
+    gallery.appendChild(img);
+  });
+
+  lightbox.addEventListener('click', closeLightbox);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lightbox.style.display === 'flex') {
+      closeLightbox();
     }
+  });
 
-    const gallery = document.getElementById('gallery');
-    const lightbox = document.getElementById('lightbox');
-
-    function disableImageInteractions(img) {
-      img.addEventListener('contextmenu', e => e.preventDefault());
-      img.addEventListener('dragstart', e => e.preventDefault());
-      img.addEventListener('selectstart', e => e.preventDefault());
-    }
-
-    function disableScroll(e) {
-      e.preventDefault();
-    }
-
-    function openLightbox(src) {
-      lightbox.innerHTML = '';
-      const enlargedImg = document.createElement('img');
-      enlargedImg.src = 'fotos/' + src;
-      enlargedImg.alt = 'Zvětšená fotografie';
-      enlargedImg.draggable = false;
-      disableImageInteractions(enlargedImg);
-      lightbox.appendChild(enlargedImg);
-      lightbox.style.display = 'flex';
-
-      const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-      document.body.style.paddingRight = scrollBarWidth + 'px';
-      document.body.style.overflow = 'hidden';
-      document.addEventListener('touchmove', disableScroll, { passive: false });
-    }
-
-    function closeLightbox() {
-      lightbox.style.display = 'none';
-      lightbox.innerHTML = '';
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
-      document.removeEventListener('touchmove', disableScroll);
-    }
-
-    shuffle(fotky).forEach(src => {
-      const img = document.createElement('img');
-      img.src = 'fotos/' + src;
-      img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
-      img.loading = "lazy";
-      img.decoding = "async";
-      img.draggable = false;
-      disableImageInteractions(img);
-      img.addEventListener('click', () => openLightbox(src));
-      gallery.appendChild(img);
+  function copyAndOpen(event, element) {
+    event.preventDefault();
+    const urlToCopy = element.getAttribute('data-copy');
+    navigator.clipboard.writeText(urlToCopy).then(() => {
+      showCopyToast(`Zkopírováno: ${urlToCopy}`);
+      window.open(element.href, '_blank');
+    }).catch(err => {
+      console.error('Chyba při kopírování:', err);
+      window.open(element.href, '_blank');
     });
+  }
 
-    lightbox.addEventListener('click', closeLightbox);
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && lightbox.style.display === 'flex') {
-        closeLightbox();
-      }
-    });
-
-    function copyAndOpen(event, element) {
-      event.preventDefault();
-      const urlToCopy = element.getAttribute('data-copy');
-      navigator.clipboard.writeText(urlToCopy).then(() => {
-        showCopyToast(`Zkopírováno: ${urlToCopy}`);
-        window.open(element.href, '_blank');
-      }).catch(err => {
-        console.error('Chyba při kopírování:', err);
-        window.open(element.href, '_blank');
-      });
-    }
-
-    function showCopyToast(message) {
-      const toast = document.getElementById('copy-toast');
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2500);
-    }
-  </script>
-
+  function showCopyToast(message) {
+    const toast = document.getElementById('copy-toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2500);
+  }
+</script>
 </body>
 </html>
