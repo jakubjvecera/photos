@@ -121,7 +121,6 @@
       -webkit-user-drag: none;
     }
 
-    /* Hover efekt pouze na zařízeních s podporou hover (desktop) */
     @media (hover: hover) and (pointer: fine) {
       #gallery img:hover {
         transform: scale(1.05);
@@ -142,12 +141,6 @@
       z-index: 1100;
       cursor: pointer;
       user-select: none;
-      -webkit-user-drag: none;
-      -webkit-touch-callout: none; /* dlouhé podržení */
-      -webkit-user-select: none; /* iOS */
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
     }
 
     #lightbox img {
@@ -155,8 +148,6 @@
       max-height: 90vh;
       border-radius: 10px;
       box-shadow: 0 0 30px rgba(255,255,255,0.8);
-      user-select: none;
-      -webkit-user-drag: none;
     }
 
     @media (max-width: 900px) {
@@ -177,7 +168,6 @@
       }
     }
 
-    /* ✅ Styl pro zelený toast */
     #copy-toast {
       position: fixed;
       top: 20px;
@@ -198,6 +188,14 @@
     #copy-toast.show {
       opacity: 1;
       top: 40px;
+    }
+
+    /* ✅ Rozmazání při otevření lightboxu */
+    body.blurred #gallery-container,
+    body.blurred #sidebar {
+      filter: blur(8px);
+      transition: filter 0.3s ease;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -230,18 +228,26 @@
   <!-- Lightbox -->
   <div id="lightbox"></div>
 
-  <!-- ✅ Zelený toast -->
+  <!-- Toast -->
   <div id="copy-toast">Zkopírováno do schránky!</div>
 
-  <!-- ✅ Info pro bez JS -->
+  <!-- Info pro bez JS -->
   <noscript>
     <div style="padding: 20px; color: white; background-color: #222; text-align: center;">
       ⚠️ Tato stránka vyžaduje JavaScript pro správné zobrazení galerie. Povolte JavaScript ve svém prohlížeči.
     </div>
   </noscript>
 
-  <script src="fotky.js"></script>
+  <!-- Script -->
   <script>
+    const fotky = [
+      "foto1.jpg",
+      "foto2.jpg",
+      "foto3.jpg",
+      "foto4.jpg"
+      // přidej další názvy obrázků podle potřeby
+    ];
+
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -283,6 +289,7 @@
         lightbox.appendChild(enlargedImg);
         lightbox.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        document.body.classList.add('blurred');
         document.addEventListener('touchmove', disableScroll, { passive: false });
       });
 
@@ -293,6 +300,7 @@
       lightbox.style.display = 'none';
       lightbox.innerHTML = '';
       document.body.style.overflow = '';
+      document.body.classList.remove('blurred');
       document.removeEventListener('touchmove', disableScroll);
     });
 
@@ -301,6 +309,7 @@
         lightbox.style.display = 'none';
         lightbox.innerHTML = '';
         document.body.style.overflow = '';
+        document.body.classList.remove('blurred');
         document.removeEventListener('touchmove', disableScroll);
       }
     });
@@ -326,6 +335,5 @@
       }, 2500);
     }
   </script>
-
 </body>
 </html>
