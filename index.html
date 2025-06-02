@@ -187,7 +187,6 @@
 </head>
 <body>
 
-  <!-- Sidebar -->
   <div id="sidebar">
     <h1>Jakub Večeřa</h1>
     <img src="logo.png" alt="Logo" id="logo" />
@@ -206,15 +205,12 @@
     </div>
   </div>
 
-  <!-- Galerie -->
   <div id="gallery-container">
     <div id="gallery"></div>
   </div>
 
-  <!-- Lightbox -->
   <div id="lightbox"></div>
 
-  <!-- Toast -->
   <div id="copy-toast">Zkopírováno do schránky!</div>
 
   <noscript>
@@ -238,12 +234,10 @@
 
     function disableImageInteractions(img) {
       img.addEventListener('contextmenu', e => e.preventDefault());
-      img.addEventListener('mousedown', e => e.preventDefault());
       img.addEventListener('dragstart', e => e.preventDefault());
       img.addEventListener('selectstart', e => e.preventDefault());
-      img.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
-      img.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
-      img.addEventListener('touchend', e => e.preventDefault());
+      img.style.userSelect = "none";
+      img.style.webkitUserDrag = "none";
     }
 
     shuffle(fotky).forEach(src => {
