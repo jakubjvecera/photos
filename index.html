@@ -236,27 +236,37 @@
     const gallery = document.getElementById('gallery');
     const lightbox = document.getElementById('lightbox');
 
+    function disableImageInteractions(img) {
+      img.addEventListener('contextmenu', e => e.preventDefault());
+      img.addEventListener('mousedown', e => e.preventDefault());
+      img.addEventListener('dragstart', e => e.preventDefault());
+      img.addEventListener('selectstart', e => e.preventDefault());
+      img.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+      img.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+      img.addEventListener('touchend', e => e.preventDefault());
+    }
+
     shuffle(fotky).forEach(src => {
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
       img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
       img.loading = "lazy";
       img.draggable = false;
+      disableImageInteractions(img);
+
       img.onerror = () => {
         img.src = 'placeholder.jpg';
         img.alt = 'Obrázek nelze načíst';
       };
 
-      // Blokace interakcí
-      img.addEventListener('contextmenu', e => e.preventDefault());
-      img.addEventListener('mousedown', e => e.preventDefault());
-      img.addEventListener('dragstart', e => e.preventDefault());
-      img.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
-      img.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
-      img.addEventListener('touchend', e => e.preventDefault());
-
       img.addEventListener('click', () => {
-        lightbox.innerHTML = `<img src="fotos/${src}" alt="Zvětšená fotografie">`;
+        lightbox.innerHTML = '';
+        const enlargedImg = document.createElement('img');
+        enlargedImg.src = 'fotos/' + src;
+        enlargedImg.alt = 'Zvětšená fotografie';
+        enlargedImg.draggable = false;
+        disableImageInteractions(enlargedImg);
+        lightbox.appendChild(enlargedImg);
         lightbox.style.display = 'flex';
         document.body.style.overflow = 'hidden';
       });
