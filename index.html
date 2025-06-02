@@ -20,6 +20,10 @@
       color: #eee;
       display: flex;
     }
+.blur {
+  filter: blur(8px);
+  transition: filter 0.3s ease;
+}
 
     #sidebar {
       width: 80px;
@@ -282,6 +286,8 @@ img.addEventListener('click', () => {
   disableImageInteractions(enlargedImg);
   lightbox.appendChild(enlargedImg);
   lightbox.style.display = 'flex';
+  document.getElementById('gallery-container').classList.add('blur');
+
 
   const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
   document.body.style.paddingRight = scrollBarWidth + 'px';
@@ -299,6 +305,8 @@ img.addEventListener('click', () => {
   document.body.style.overflow = '';
   document.body.style.paddingRight = '';
   document.removeEventListener('touchmove', disableScroll);
+  document.getElementById('gallery-container').classList.remove('blur');
+
 });
 
 
@@ -309,6 +317,7 @@ if (e.key === 'Escape' && lightbox.style.display === 'flex') {
   document.body.style.overflow = '';
   document.body.style.paddingRight = '';
   document.removeEventListener('touchmove', disableScroll);
+  document.getElementById('gallery-container').classList.remove('blur');
 }
     });
 
