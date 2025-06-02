@@ -94,24 +94,42 @@
       background: #555;
     }
 
+    /* Místo #gallery použijeme #gallery-container flex s 4 sloupci */
     #gallery-container {
       margin-left: 80px;
       padding: 20px;
       width: 100%;
       overflow-y: auto;
-    }
-
-    #gallery {
-      column-count: 4;
-      column-gap: 15px;
       max-width: 1200px;
-      margin: 0 auto;
+      margin-right: auto;
+      margin-left: auto;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
     }
 
-    #gallery img {
+    /* Každý sloupec je flex sloupec */
+    .gallery-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    /* Náhodný vysoký blok nad fotkami */
+    .random-block {
+      background: #333;
+      border-radius: 8px;
+      user-select: none;
+      -webkit-user-drag: none;
+      width: 100%;
+      /* výšku nastavíme v JS náhodně */
+    }
+
+    /* Fotky */
+    .gallery-column img {
       width: 100%;
       height: auto;
-      margin-bottom: 15px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.7);
       cursor: pointer;
@@ -121,59 +139,31 @@
       -webkit-user-drag: none;
     }
 
-    /* Hover efekt pouze na zařízeních s podporou hover (desktop) */
     @media (hover: hover) and (pointer: fine) {
-      #gallery img:hover {
+      .gallery-column img:hover {
         transform: scale(1.05);
         box-shadow: 0 4px 16px rgba(255,255,255,0.8);
       }
     }
 
-    #lightbox {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1100;
-      cursor: pointer;
-      user-select: none;
-      -webkit-user-drag: none;
-      -webkit-touch-callout: none; /* dlouhé podržení */
-      -webkit-user-select: none; /* iOS */
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-
-    #lightbox img {
-      max-width: 90vw;
-      max-height: 90vh;
-      border-radius: 10px;
-      box-shadow: 0 0 30px rgba(255,255,255,0.8);
-      user-select: none;
-      -webkit-user-drag: none;
-    }
-
     @media (max-width: 900px) {
-      #gallery {
-        column-count: 3;
+      #gallery-container {
+        max-width: 900px;
+      }
+    }
+
+    @media (max-width: 800px) {
+      #gallery-container {
+        flex-wrap: wrap;
+      }
+      .gallery-column {
+        flex: 0 0 48%;
       }
     }
 
     @media (max-width: 600px) {
-      #gallery {
-        column-count: 2;
-      }
-    }
-
-    @media (max-width: 400px) {
-      #gallery {
-        column-count: 1;
+      .gallery-column {
+        flex: 0 0 100%;
       }
     }
 
@@ -222,9 +212,12 @@
     </div>
   </div>
 
-  <!-- Galerie -->
+  <!-- Galerie container s 4 sloupci -->
   <div id="gallery-container">
-    <div id="gallery"></div>
+    <div class="gallery-column" id="col-0"></div>
+    <div class="gallery-column" id="col-1"></div>
+    <div class="gallery-column" id="col-2"></div>
+    <div class="gallery-column" id="col-3"></div>
   </div>
 
   <!-- Lightbox -->
@@ -250,8 +243,12 @@
       return array;
     }
 
-    const gallery = document.getElementById('gallery');
-    const lightbox = document.getElementById('lightbox');
+    const galleryColumns = [
+      document.getElementById('col-0'),
+      document.getElementById('col-1'),
+      document.getElementById('col-2'),
+      document.getElementById('col-3'),
+    ];
 
     function disableImageInteractions(img) {
       img.addEventListener('contextmenu', e => e.preventDefault());
@@ -265,7 +262,19 @@
       e.preventDefault();
     }
 
-    shuffle(fotky).forEach(src => {
+    // Shuffle fotky
+    shuffle(fotky);
+
+    // Nad každý sloupec vložíme náhodný blok s výškou mezi 100 a 300 px
+    galleryColumns.forEach(col => {
+      const block = document.createElement('div');
+      block.className = 'random-block';
+      block.style.height = (100 + Math.floor(Math.random() * 200)) + 'px';
+      col.appendChild(block);
+    });
+
+    // Rozdělíme fotky rovnoměrně do 4 sloupců pod blok
+    fotky.forEach((src, index) => {
       const img = document.createElement('img');
       img.src = 'fotos/' + src;
       img.alt = 'Fotografie ' + src.replace(/\.[^.]+$/, '');
@@ -286,7 +295,9 @@
         document.addEventListener('touchmove', disableScroll, { passive: false });
       });
 
-      gallery.appendChild(img);
+      // Přidáme do sloupce podle indexu
+      const colIndex = index % 4;
+      galleryColumns[colIndex].appendChild(img);
     });
 
     lightbox.addEventListener('click', () => {
@@ -321,11 +332,8 @@
       const toast = document.getElementById('copy-toast');
       toast.textContent = message;
       toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2500);
+      setTimeout(() => toast.classList.remove('show'), 2500);
     }
   </script>
-
 </body>
 </html>
