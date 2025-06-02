@@ -19,6 +19,7 @@
       font-family: Courier, sans-serif;
       color: #eee;
       display: flex;
+      user-select: none;
     }
 
     #sidebar {
@@ -112,6 +113,8 @@
       cursor: pointer;
       transition: transform 0.3s;
       display: block;
+      user-select: none;
+      pointer-events: auto;
     }
 
     #gallery img:hover {
@@ -138,6 +141,8 @@
       max-height: 90vh;
       border-radius: 10px;
       box-shadow: 0 0 30px rgba(255,255,255,0.8);
+      user-select: none;
+      pointer-events: none;
     }
 
     @media (max-width: 900px) {
@@ -181,7 +186,7 @@
     }
   </style>
 </head>
-<body>
+<body oncontextmenu="return false">
 
   <div id="sidebar" role="navigation">
     <h1>Jakub Večeřa</h1>
@@ -236,6 +241,10 @@
         img.src = 'placeholder.jpg';
         img.alt = 'Obrázek nelze načíst';
       };
+      img.draggable = false;
+      img.addEventListener('contextmenu', e => e.preventDefault());
+      img.addEventListener('mousedown', e => e.preventDefault());
+      img.addEventListener('dragstart', e => e.preventDefault());
       img.addEventListener('click', () => {
         lightbox.innerHTML = `<img src="fotos/${src}" alt="Zvětšená fotografie">`;
         lightbox.style.display = 'flex';
