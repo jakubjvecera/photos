@@ -20,7 +20,7 @@ jobs:
         run: |
           echo "const fotky = [" > fotky.js
           shopt -s nullglob
-          for f in fotos/*.{jpg,jpeg,png,gif}; do
+          for f in fotos/*.{jpg,jpeg,png,gif,webp}; do
             echo "  \"$(basename "$f")\"," >> fotky.js
           done
           echo "];" >> fotky.js
