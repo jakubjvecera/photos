@@ -332,12 +332,12 @@
       document.getElementById('gallery-container').classList.remove('blur');
       document.getElementById('sidebar').classList.remove('blur');
       document.body.classList.remove('no-scroll');
+      document.body.style.paddingRight = '';
 
       setTimeout(() => {
         lightboxElement.style.display = 'none';
         lightboxElement.innerHTML = '';
         document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
         document.removeEventListener('touchmove', disableScroll);
       }, 300);
     }
