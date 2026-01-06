@@ -39,4 +39,13 @@ const fotky = [
   "P1090514.webp",
   "P1090559.webp",
   "P1090611.webp",
+  "P1140495.webp",
+  "P1140587.webp",
+  "P1140597.webp",
+  "P1140604.webp",
+  "P1140654.webp",
+  "P1140697.webp",
+  "P1140742.webp",
+  "P1140804.webp",
+  "P1140867.webp",
 ];
